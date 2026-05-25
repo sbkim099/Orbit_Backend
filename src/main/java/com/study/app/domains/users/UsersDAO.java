@@ -19,4 +19,8 @@ public class UsersDAO {
 		return batis.selectOne("Users.login", dto);
 	}
 	
+	public int insertUser(UsersDTO dto) {
+		return batis.insert("Users.insertUser", dto);
+	}
+	
 }

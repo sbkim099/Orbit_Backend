@@ -7,6 +7,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.study.app.domains.users.UsersDTO;
+
 @Repository
 public class SignupDAO {
 	
@@ -40,4 +42,8 @@ public class SignupDAO {
     public SignupDTO getUserInfo(Long signup_seq) {
 		return mybatis.selectOne("Signup.getUserInfo", signup_seq);
 	}
+    
+    public int updateStatusToApproved(Long signup_seq) {
+    	return mybatis.update("Signup.updateStatusToApproved", signup_seq);
+    }
 }

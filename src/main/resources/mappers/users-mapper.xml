@@ -7,4 +7,10 @@
 		select count(*) from users where id = #{id} and pw = #{pw}
 	</select>
 	
+	<insert id="insertUser">
+		insert into users values(#{id}, #{pw}, users_seq.nextval, #{name}, #{phone}, 
+		#{email}, #{oriname}, #{ssn_hash}, #{ssn_enc}, #{ssn_masked}, #{zonecode}, 
+		#{address1}, #{address2}, 'USER', 'ACTIVE', #{hire_date}, null, #{dept_seq}, 
+		#{rank_seq}, sysdate, null, #{sysname})
+	</insert>
 </mapper>
