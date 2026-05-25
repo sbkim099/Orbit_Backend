@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,5 +40,11 @@ public class SchedulesController {
 	    String usersId = jwtUtil.getSubject(token.replace("Bearer ", ""));
 	    List<SchedulesDTO> list = schedServ.getSchedules(usersId);
 	    return ResponseEntity.ok(list);
+	}
+	
+	@DeleteMapping("/{schedule_seq}")
+	public ResponseEntity<Void> deleteSchedules(@PathVariable Long schedule_seq){
+		schedServ.deleteSchedules(schedule_seq);
+		return ResponseEntity.ok().build();
 	}
 }

@@ -18,4 +18,8 @@ public class SchedulesService {
 	public List<SchedulesDTO> getSchedules(String usersId) {
 	    return schedDAO.getSchedules(usersId);
 	}
+	
+	public int deleteSchedules(Long schedule_seq) {
+		return schedDAO.deleteSchedules(schedule_seq);
+	}
 }

@@ -19,4 +19,8 @@ public class SchedulesDAO {
 	public List<SchedulesDTO> getSchedules(String usersId) {
 	    return mybatis.selectList("getSchedules", usersId);
 	}
+	
+	public int deleteSchedules(Long schedule_seq) {
+		return mybatis.delete("deleteSchedules",schedule_seq);
+	}
 }
