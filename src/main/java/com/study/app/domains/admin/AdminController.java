@@ -95,7 +95,7 @@ public class AdminController {
 	
 	@PutMapping("/hr/updateUsersInfo")
 	public ResponseEntity<Void> updateUsersInfo(@RequestBody UsersDTO dto){
-		adminServ.updateUsersState(dto);
+		adminServ.updateUsersInfo(dto);
 		return ResponseEntity.ok().build();
 	}
 	

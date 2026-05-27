@@ -34,6 +34,7 @@
 	<select id="getAllUsers" resultType="com.study.app.domains.users.UsersDTO">
 		SELECT
 	        u.users_seq, u.name, u.id, u.role, u.hire_date,
+	        u.dept_seq, u.rank_seq,
 	        d.dept_name, r.rank_name,
 	        CASE u.status
 	            WHEN 'ACTIVE' THEN '재직'
@@ -50,9 +51,13 @@
 		status = #{status},  update_at = sysdate where users_seq = #{users_seq}
 	</update>
 	<update id="updateUsersInfo">
-		update users set name = #{name}, dept_seq = #{dept_seq}, rank_seq = {rank_seq},
-			   role=#{role}, update_at = sysdate
-		where users_seq = #{users_seq}
+		update users set 
+        name = #{name},
+        dept_seq = NVL(#{dept_seq, jdbcType=NUMERIC}, dept_seq),
+        rank_seq = NVL(#{rank_seq, jdbcType=NUMERIC}, rank_seq),
+        role = #{role, jdbcType=VARCHAR},
+        update_at = sysdate
+    where users_seq = #{users_seq}
 	</update>	
 	<select id="getAllEmployees" resultType="com.study.app.domains.users.UsersDTO">
     SELECT 
