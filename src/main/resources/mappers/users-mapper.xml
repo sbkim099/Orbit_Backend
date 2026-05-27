@@ -31,9 +31,9 @@
 		left join rank r on u.rank_seq = r.rank_seq
 		where id = #{loginId}
 	</select>
-	<select id="getAllUsersInfo" resultType="com.study.app.domains.users.UsersDTO">
+	<select id="getAllUsers" resultType="com.study.app.domains.users.UsersDTO">
 		SELECT
-	        u.users_seq, u.name, u.email, u.role, u.hire_date,
+	        u.users_seq, u.name, u.id, u.role, u.hire_date,
 	        d.dept_name, r.rank_name,
 	        CASE u.status
 	            WHEN 'ACTIVE' THEN '재직'
@@ -45,4 +45,8 @@
 	    LEFT JOIN rank r ON u.rank_seq = r.rank_seq
 	    ORDER BY u.users_seq
 	</select>
+	<update id="updateUsersState">
+		update users set 
+		status = #{status},  update_at = sysdate where users_seq = #{users_seq}
+	</update>
 </mapper>
