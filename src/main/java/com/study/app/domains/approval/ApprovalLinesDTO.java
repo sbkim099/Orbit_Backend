@@ -63,4 +63,35 @@ public class ApprovalLinesDTO {
 	public void setReject_reason(String reject_reason) {
 		this.reject_reason = reject_reason;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private String sysname;
+
+	public ApprovalLinesDTO(String sysname) {
+		super();
+		this.sysname = sysname;
+	}
+	public String getSysname() {
+		return sysname;
+	}
+	public void setSysname(String sysname) {
+		this.sysname = sysname;
+	}
+	
 }
