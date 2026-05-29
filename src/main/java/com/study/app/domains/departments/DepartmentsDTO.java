@@ -1,22 +1,25 @@
 package com.study.app.domains.departments;
 
 public class DepartmentsDTO {
-	
+
 	private Long dept_seq;
 	private String dept_name;
 	private String dept_code;
 	private Long parent_dept_seq;
 	private String created_at;
-	
+
+	private String dept_type; // Admin 부서관리 본부/부서 생성때문에 DTO에만 추가
+
 	public DepartmentsDTO() {}
 
-	public DepartmentsDTO(Long dept_seq, String dept_name, String dept_code, Long parent_dept_seq, String created_at) {
+	public DepartmentsDTO(Long dept_seq, String dept_name, String dept_code, Long parent_dept_seq, String created_at, String dept_type) {
 		super();
 		this.dept_seq = dept_seq;
 		this.dept_name = dept_name;
 		this.dept_code = dept_code;
 		this.parent_dept_seq = parent_dept_seq;
 		this.created_at = created_at;
+		this.dept_type = dept_type;
 	}
 
 	public Long getDept_seq() {
@@ -57,5 +60,13 @@ public class DepartmentsDTO {
 
 	public void setCreated_at(String created_at) {
 		this.created_at = created_at;
+	}
+
+	public String getDept_type() {
+		return dept_type;
+	}
+
+	public void setDept_type(String dept_type) {
+		this.dept_type = dept_type;
 	}
 }

@@ -68,28 +68,28 @@ public class AdminService {
 	}
 
 	public Map<String, Object> getAllUsers(String keyword, String status, Long start, Long end) {
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("keyword", keyword);
-	    params.put("status", status);
-	    params.put("start", start);
-	    params.put("end", end);
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", keyword);
+		params.put("status", status);
+		params.put("start", start);
+		params.put("end", end);
 
-	    List<UsersDTO> users = usersDao.getAllUsers(params);
-	    int totalCount = usersDao.getTotalCount(params);
-	    int activeCount = usersDao.getCountByStatus("ACTIVE", params);
-	    int inactiveCount = usersDao.getCountByStatus("INACTIVE", params);
-	    int rejectedCount = usersDao.getCountByStatus("REJECTED", params);
+		List<UsersDTO> users = usersDao.getAllUsers(params);
+		int totalCount = usersDao.getTotalCount(params);
+		int activeCount = usersDao.getCountByStatus("ACTIVE", params);
+		int inactiveCount = usersDao.getCountByStatus("INACTIVE", params);
+		int rejectedCount = usersDao.getCountByStatus("REJECTED", params);
 
-	    Map<String, Object> result = new HashMap<>();
-	    result.put("users", users);
-	    result.put("totalCount", totalCount);
-	    result.put("activeCount", activeCount);
-	    result.put("inactiveCount", inactiveCount);
-	    result.put("rejectedCount", rejectedCount);
+		Map<String, Object> result = new HashMap<>();
+		result.put("users", users);
+		result.put("totalCount", totalCount);
+		result.put("activeCount", activeCount);
+		result.put("inactiveCount", inactiveCount);
+		result.put("rejectedCount", rejectedCount);
 
-	    return result;
+		return result;
 	}
-	
+
 
 	public int updateUsersState(UsersDTO dto) {
 		return usersDao.updateUsersState(dto);
@@ -98,12 +98,15 @@ public class AdminService {
 	public int updateUsersInfo(UsersDTO dto) {
 		return usersDao.updateUsersInfo(dto);
 	}
-	
+
 	public void addDept(DepartmentsDTO dto) {
-		adminDao.addDept(dto);
+		
+		if("HQ".equals(dto.getDept_type())) {
+			adminDao.addDept(dto);
+		}else if("SUB".equals(dto.getDept_type())) {
+			adminDao.addTeam(dto);
+		}
+
 	}
-	
-	public void addTeam(DepartmentsDTO dto) {
-		adminDao.addTeam(dto);
-	}
+
 }

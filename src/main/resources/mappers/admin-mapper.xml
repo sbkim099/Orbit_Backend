@@ -7,6 +7,9 @@
 			#{dept_code}, #{parent_dept_seq}, sysdate)
 	</insert>
 	
-	
+	<insert id="addTeam">
+		insert into departments values(dept_seq.nextval, #{dept_name},
+			#{dept_code}, #{parent_dept_seq}, sysdate)
+	</insert>
 
 </mapper>
