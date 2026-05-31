@@ -94,10 +94,10 @@ public class ApprovalDAO {
 		return mybatis.selectList("Approval.selectPurchaseAttachments", purchase_seq);
 	}
 	
-	public Map<String, Object> selectMyApprovalLine(Long doc_seq, String users_id) {
+	public Map<String, Object> selectMyApprovalLine(Long doc_seq, String loginId) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("doc_seq", doc_seq);
-	    params.put("users_id", users_id);
+	    params.put("users_id", loginId);
 	    return mybatis.selectOne("Approval.selectMyApprovalLine", params);
 	}
 
@@ -108,18 +108,18 @@ public class ApprovalDAO {
 	    return mybatis.selectOne("Approval.selectNextApprovalLine", params);
 	}
 
-	public void updateApprovalLineStatus(Long doc_seq, String users_id, String status) {
+	public void updateApprovalLineStatus(Long doc_seq, String loginId, String status) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("doc_seq", doc_seq);
-	    params.put("users_id", users_id);
+	    params.put("users_id", loginId);
 	    params.put("status", status);
 	    mybatis.update("Approval.updateApprovalLineStatus", params);
 	}
 	
-	public void updateNextApprovalLineStatus(Long doc_seq, String users_id, String status) {
+	public void updateNextApprovalLineStatus(Long doc_seq, String loginId, String status) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("doc_seq", doc_seq);
-		params.put("users_id", users_id);
+		params.put("users_id", loginId);
 		params.put("status", status);
 		mybatis.update("Approval.updateNextApprovalLineStatus", params);
 	}
@@ -129,6 +129,23 @@ public class ApprovalDAO {
 	    params.put("doc_seq", doc_seq);
 	    params.put("status", status);
 	    mybatis.update("Approval.updateDocumentStatus", params);
+	}
+	
+	public void updateApprovalLineStatusToReject(Long doc_seq, String loginId, String status, String reject_reason) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("doc_seq", doc_seq);
+		params.put("users_id", loginId);
+		params.put("status", status);
+		params.put("reject_reason", reject_reason);
+		mybatis.update("Approval.updateApprovalLineStatusToReject", params);
+	}
+	
+	public void updateDocument(Long doc_seq, String status, String reject_reason) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("doc_seq", doc_seq);
+	    params.put("status", status);
+	    params.put("reject_reason", reject_reason);
+	    mybatis.update("Approval.updateDocumentStatusToReject", params);
 	}
 	
 	

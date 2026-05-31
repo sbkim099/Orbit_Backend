@@ -169,7 +169,14 @@
 		update draft_documents set status = #{status} where doc_seq = #{doc_seq}
 	</update>
 	
+	<update id="updateApprovalLineStatusToReject">
+		update approval_lines set status = #{status}, handle_at = sysdate, reject_reason = #{reject_reason}
+		where doc_seq = #{doc_seq} and users_id = #{users_id}
+	</update>
 	
+	<update id="updateDocumentStatusToReject">
+		update draft_documents set status = #{status}, reject_reason = #{reject_reason} where doc_seq = #{doc_seq}
+	</update>
 	
 	
 	

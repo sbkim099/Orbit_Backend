@@ -88,12 +88,21 @@ public class ApprovalController {
 
 	@PutMapping("approve/{doc_seq}")
 	public ResponseEntity<Void> approveDraft(@PathVariable Long doc_seq,
-												@RequestParam String users_id){
-		appServ.approveDraft(doc_seq, users_id);
+												@RequestAttribute String loginId){
+		appServ.approveDraft(doc_seq, loginId);
 		return ResponseEntity.ok().build();
 	}
 	
-	
+	@PutMapping("reject/{doc_seq}")
+	public ResponseEntity<Void> rejectApproval(@PathVariable Long doc_seq,
+												@RequestAttribute String loginId,
+												@RequestBody Map<String, Object> data){
+		System.out.println("data: " + data);
+		String reject_reason = String.valueOf(data.get("reject_reason"));
+		System.out.println("reject_reason : " + reject_reason);
+		appServ.rejectApproval(doc_seq, loginId, reject_reason);
+		return ResponseEntity.ok().build();
+	}
 	
 	
 	
