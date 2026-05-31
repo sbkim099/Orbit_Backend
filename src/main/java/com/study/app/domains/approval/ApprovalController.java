@@ -1,11 +1,13 @@
 package com.study.app.domains.approval;
 
+import com.study.app.domains.admin.AdminController;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,10 +27,15 @@ import com.study.app.domains.users.UsersService;
 @RequestMapping("/approval")
 public class ApprovalController {
 
+	private final AdminController adminController;
 	@Autowired
 	private UsersService usersServ;
 	@Autowired
 	private ApprovalService appServ;
+
+	ApprovalController(AdminController adminController) {
+		this.adminController = adminController;
+	}
 
 	@GetMapping("all")
 	public ResponseEntity<List<UsersDTO>> getAllEmployees(){
@@ -212,8 +219,47 @@ public class ApprovalController {
 	@GetMapping("/cc/page")
 	public ResponseEntity<Map<String, Object>> getCcDocumentsByPage(
 			@RequestAttribute String loginId, @RequestParam String status, @RequestParam Long cpage){
-		
 		Map<String, Object> result = appServ.getCcDocumentsByPage(loginId, status, cpage);
 		return ResponseEntity.ok(result);
+	}
+	
+	@GetMapping("/myDoc")
+	public ResponseEntity<List<DraftDocumentsDTO>> getMyDocuments(@RequestAttribute String loginId) {
+		List<DraftDocumentsDTO> list = appServ.getMyDocWithLine(loginId);
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("/myDoc/page")
+	public ResponseEntity<Map<String, Object>> getMyDocumentsByPage(@RequestAttribute String loginId,
+			@RequestParam String status, @RequestParam Long cpage,
+			@RequestParam String keyword, @RequestParam String docType) {
+		Map<String, Object> result = appServ.getMyDocumentsByPage(loginId, status, cpage, keyword, docType);
+		return ResponseEntity.ok(result);
+	}
+	
+	@GetMapping("/MydraftDoc")
+	public ResponseEntity<List<DraftDocumentsDTO>> getMydraftDoc(@RequestAttribute String loginId) {
+		List<DraftDocumentsDTO> list = appServ.getMydraftDoc(loginId);
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("/MyDoneDoc/page")
+	public ResponseEntity<Map<String, Object>> getMyDoneDocByPage(@RequestAttribute String loginId,
+			@RequestParam Long cpage, @RequestParam String keyword, @RequestParam String docType) {
+		Map<String, Object> result = appServ.getMyDoneDocByPage(loginId, cpage, keyword, docType);
+		return ResponseEntity.ok(result);
+	}
+	
+	@GetMapping("/temp")
+	public ResponseEntity<List<DraftDocumentsDTO>> getTempDoc(@RequestAttribute String loginId) {
+		List<DraftDocumentsDTO> result = appServ.getTempDoc(loginId);
+		return ResponseEntity.ok(result);
+	}
+	
+	@DeleteMapping("/tempDelete/{doc_seq}")
+	public ResponseEntity<Void> deleteTempDoc(@PathVariable Long doc_seq, 
+			@RequestParam String doc_type) {
+		appServ.deleteTempDoc(doc_seq, doc_type);
+		return ResponseEntity.ok().build();
 	}
 }

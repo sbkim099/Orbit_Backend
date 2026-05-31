@@ -297,6 +297,25 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	<select id="getCcList" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
 		select d.*, u.name as name 
 			from draft_documents d 
@@ -335,121 +354,145 @@
 			where c.users_id = #{loginId} and d.status = #{status}
 	</select>
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	<select id="getMyDoc" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select d.*, u.name as name 
+			from draft_documents d 
+			inner join users u on d.users_id = u.id
+			where d.users_id = #{loginId}
+			order by d.created_at desc
+	</select>
+	
+	<select id="getMyDocPage" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select * from (select row_number() over(order by d.created_at desc) rn, 
+			d.*, u.name as name
+			from draft_documents d
+			inner join users u on d.users_id = u.id
+			where d.users_id = #{loginId} and d.status = #{status}
+			
+			<if test="keyword != null and keyword != ''">
+            	and lower(d.title) like '%' || lower(#{keyword}) || '%'
+        	</if>
+
+	        <if test="docType != null and docType != '' and docType != '전체' and docType != '전체 문서'">
+	            and d.doc_type = #{docType}
+	        </if>
+	        
+			)
+			where rn between #{start} and #{end}
+	</select>
+	
+	<select id="getMyDocPageCount" resultType="int">
+		select count(*) from draft_documents d
+			where d.users_id = #{loginId} and status = #{status}
+			
+			<if test="keyword != null and keyword != ''">
+		        and lower(d.title) like '%' || lower(#{keyword}) || '%'
+		    </if>
+
+		    <if test="docType != null
+		              and docType != ''
+		              and docType != '전체'
+		              and docType != '전체 문서'">
+		        and d.doc_type = #{docType}
+		    </if>
+	</select>
+	
+	<select id="getMydraftDoc" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select d.*, u.name as name, u.sysname as sysname, a.status as app_status
+			from approval_lines a
+			inner join draft_documents d on a.doc_seq = d.doc_seq
+			inner join users u on d.users_id = u.id
+			where a.users_id = #{loginId}
+			and a.status = 'IN_PROGRESS'
+			order by d.created_at
+	</select>
+	
+	<select id="getMyDoneDocByPage" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select * from (select row_number() over(order by a.handle_at desc) rn, 
+			d.*, u.name as name, u.sysname as sysname, a.status as app_status
+			from approval_lines a
+			inner join draft_documents d on a.doc_seq = d.doc_seq
+			inner join users u on d.users_id = u.id
+			where a.users_id = #{loginId} and a.status in ('APPROVED', 'REJECTED')
+			
+			<if test="keyword != null and keyword != ''">
+            	and lower(d.title) like '%' || lower(#{keyword}) || '%'
+        	</if>
+
+	        <if test="docType != null and docType != '' and docType != '전체' and docType != '전체 문서'">
+	            and d.doc_type = #{docType}
+	        </if>
+	        
+			)
+			where rn between #{start} and #{end}
+	</select>
+	
+	<select id="getMyDoneDocCount" resultType="int">
+		select count(*) from approval_lines a
+		inner join draft_documents d on a.doc_seq = d.doc_seq
+		where a.users_id = #{loginId} and a.status in ('APPROVED', 'REJECTED')
+			<if test="keyword != null and keyword != ''">
+	            and lower(d.title) like '%' || lower(#{keyword}) || '%'
+        	</if>
+
+	        <if test="docType != null and docType != '' and docType != '전체' and docType != '전체 문서'">
+	            and d.doc_type = #{docType}
+	        </if>
+	</select>
+	
+	<select id="getTempDoc" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select * from draft_documents where users_id = #{loginId} and status = 'TEMP'
+			order by updated_at desc
+	</select>
+	
+	<select id="tempList" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
+		select * from draft_documents where status = 'TEMP' and temp_expires_at &lt;= sysdate
+	</select>
+	
+	<delete id ="deleteAppLine">
+		delete from approval_lines where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deleteAppCc">
+		delete from approval_cc where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deleteDraftDoc">
+		delete from draft_documents where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deleteVacDoc">
+		delete from vacation where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deleteGenDoc">
+		delete from general where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deletePayItem">
+		delete from payment_items where pay_seq in
+			(select pay_seq from payment where doc_seq = #{doc_seq}
+		)
+	</delete>
+	
+	<delete id ="deletePayDoc">
+		delete from payment where doc_seq = #{doc_seq}
+	</delete>
+	
+	<delete id ="deletePurAttach">
+		delete from purchase_attachments where purchase_seq in
+    		(select purchase_seq from purchase where doc_seq = #{doc_seq}
+    	)
+	</delete>
+	
+	<delete id ="deletePurItem">
+		delete from purchase_items where purchase_seq in
+			(select purchase_seq from purchase where doc_seq = #{doc_seq}
+		)
+	</delete>
+	
+	<delete id ="deletePurDoc">
+		delete from purchase where doc_seq = #{doc_seq}
+	</delete>
 	
 </mapper>
