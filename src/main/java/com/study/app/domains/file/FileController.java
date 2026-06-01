@@ -32,6 +32,7 @@ public class FileController {
 		// -> 다운로드가 아닌 출력만 하는 이미지를 알려주기 위해 contentType을 고정하여 발송.
 	}
 	
+	// 첨부파일 다운로드 기능
 	@GetMapping("/download/{sysname}")
 	public ResponseEntity<Resource> download(@PathVariable String sysname) throws Exception{
 		return fileServ.download(sysname);

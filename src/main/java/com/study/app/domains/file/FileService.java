@@ -58,7 +58,8 @@ public class FileService {
 		}
 		return blob.getContent();
 	}
-
+	
+	// 첨부파일 다운로드 기능
 	public ResponseEntity<Resource> download(String sysname) throws Exception{
 		Blob blob = storage.get(BlobId.of(bucketName, sysname));
 		
