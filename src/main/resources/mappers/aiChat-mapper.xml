@@ -17,4 +17,14 @@
 	<insert id="insertMessage">
 		insert into ai_messages values(msg_seq.nextval, #{chat_seq}, #{role}, #{content}, #{ref_chunk_ids, jdbcType=VARCHAR}, sysdate)
 	</insert>
+	
+	<select id="sideChatTitleList" resultType="com.study.app.domains.aiChat.AiChatDTO">
+		select chat_seq, title from ai_chat where users_id = #{loginId}
+			order by updated_at desc
+	</select>
+	
+	<select id="detailChat" resultType="com.study.app.domains.aiChat.AiMessagesDTO">
+		select role, content from ai_messages where chat_seq = #{chat_seq}
+			order by msg_seq
+	</select>
 </mapper>

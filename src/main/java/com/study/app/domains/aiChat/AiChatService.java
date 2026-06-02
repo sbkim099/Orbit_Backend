@@ -80,14 +80,14 @@ public class AiChatService {
 		}catch(Exception e) {
 			e.printStackTrace();
 			dbRefChunkValue = "[]"; // 오류 발생 시 빈 배열 주입
-			System.out.println("변환 작업 중 오류 발생");
+//			System.out.println("변환 작업 중 오류 발생");
 		}
 		
 		
 		double maxScore = 0.0;
 		if(!similarDocs.isEmpty()) {
 			maxScore = similarDocs.get(0).getScore();
-			System.out.println("최고 유사도 점수 : " + maxScore);
+//			System.out.println("최고 유사도 점수 : " + maxScore);
 		}
 		// 인사 문의 : 0.72
 		// 연차 발생 규정 : 0.70
@@ -135,11 +135,19 @@ public class AiChatService {
 
 		ChatResponse response = chatModel.call(prompt);
 		String aiAnswer = response.getResult().getOutput().getText();
-		System.out.println(dbRefChunkValue);
+//		System.out.println(dbRefChunkValue);
 		
 		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI", aiAnswer, dbRefChunkValue, null));
 		aiResult.put("aiAnswer", aiAnswer);
 		return aiResult;
+	}
+	
+	public List<AiChatDTO> sideChatTitleList(String loginId) {
+		return aiDao.sideChatTitleList(loginId);
+	}
+	
+	public List<AiMessagesDTO> detailChat(Long chat_seq) {
+		return aiDao.detailChat(chat_seq);
 	}
 
 
