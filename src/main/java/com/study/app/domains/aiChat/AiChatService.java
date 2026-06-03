@@ -193,6 +193,13 @@ public class AiChatService {
 		
 		aiDao.insertQuestion(params);
 	}
+	
+	@Transactional
+	public void deleteChat(Long chat_seq) {
+		aiDao.deleteQuestions(chat_seq);
+		aiDao.deleteAiMessages(chat_seq);
+		aiDao.deleteAiChat(chat_seq);
+	}
 
 	
 }

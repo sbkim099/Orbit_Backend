@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,8 +42,13 @@ public class AiChatController {
 	@PostMapping("/insertQuestion")
 	public ResponseEntity<Void> insertQuestion(@RequestAttribute String loginId,
 			@RequestBody AiUnansweredQuestionsDTO dto) {
-
 		aiServ.insertQuestion(loginId, dto);
+		return ResponseEntity.ok().build();
+	}
+	
+	@DeleteMapping("/deleteChat/{chat_seq}")
+	public ResponseEntity<Void> deleteChat(@PathVariable Long chat_seq) {
+		aiServ.deleteChat(chat_seq);
 		return ResponseEntity.ok().build();
 	}
 }

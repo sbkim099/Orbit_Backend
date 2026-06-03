@@ -36,4 +36,16 @@ public class AiChatDAO {
 	public void insertQuestion(Map<String, Object> params) {
 		batis.insert("AiChat.insertQuestion", params);
 	}
+	
+	public void deleteQuestions(Long chat_seq) {
+		batis.delete("AiChat.deleteQuestions", chat_seq);
+	}
+	
+	public void deleteAiMessages(Long chat_seq) {
+		batis.delete("AiChat.deleteAiMessages", chat_seq);
+	}
+	
+	public void deleteAiChat(Long chat_seq) {
+		batis.delete("AiChat.deleteAiChat", chat_seq);
+	}
 }
