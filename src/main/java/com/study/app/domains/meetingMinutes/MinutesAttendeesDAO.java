@@ -12,4 +12,8 @@ public class MinutesAttendeesDAO {
 	public int insertMinutesAttendees(MinutesAttendeesDTO dto) {
 		return mybatis.insert("MinutesAttendees.insertMinutesAttendees",dto);
 	}
+	
+	public int deleteMinutesAttendees(Long minute_seq) {
+		return mybatis.delete("MinutesAttendees.deleteMinutesAttendees",minute_seq);
+	}
 }

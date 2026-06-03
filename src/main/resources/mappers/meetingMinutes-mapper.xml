@@ -42,23 +42,33 @@
 	    <collection property="attendees" ofType="com.study.app.domains.meetingMinutes.MinutesAttendeesDTO">
 	        <id property="attendee_seq" column="ATTENDEE_SEQ"/>
 	        <result property="users_id" column="ATTENDEE_USER_ID"/>
+	        <result property="name" column="ATTENDEE_NAME"/>
+	        <result property="sysname" column="ATTENDEE_SYSNAME"/>
 	    </collection>
 	</resultMap>
 
 	<select id="getMinutesList" resultMap="minutesResultMap">
-	    SELECT
+		 SELECT
 	        m.MINUTE_SEQ,
 	        m.TITLE,
 	        m.MEETING_DT,
+	        m.START_TIME,
+	        m.END_TIME,
+	        m.MAIN_CONTENT,
+	        m.DECISIONS,
+	        m.TODOS,
+	        m.USERS_ID,
 	        m.CREATED_AT, 
+	        a.ATTENDEE_SEQ,
 	        a.USERS_ID AS ATTENDEE_USER_ID,
-	        a.ATTENDEE_SEQ
+	        u.NAME AS ATTENDEE_NAME,       
+	        u.SYSNAME AS ATTENDEE_SYSNAME  
 	    FROM MEETING_MINUTES m
 	    LEFT JOIN MINUTES_ATTENDEES a ON m.MINUTE_SEQ = a.MINUTE_SEQ
-	    ORDER BY m.CREATED_AT DESC
+	    LEFT JOIN USERS u ON a.USERS_ID = u.ID ORDER BY m.CREATED_AT DESC
 	</select>
 	<select id="getMinutesDetail" resultMap="minutesResultMap">
-	    SELECT 
+	      SELECT
 	        m.MINUTE_SEQ,
 	        m.TITLE,
 	        m.MEETING_DT,
@@ -70,9 +80,27 @@
 	        m.USERS_ID,
 	        m.CREATED_AT,
 	        a.ATTENDEE_SEQ,
-	        a.USERS_ID AS ATTENDEE_USER_ID
+	        a.USERS_ID AS ATTENDEE_USER_ID,
+	        u.NAME AS ATTENDEE_NAME,
+	        u.SYSNAME AS ATTENDEE_SYSNAME
 	    FROM MEETING_MINUTES m
 	    LEFT JOIN MINUTES_ATTENDEES a ON m.MINUTE_SEQ = a.MINUTE_SEQ
+	    LEFT JOIN USERS u ON a.USERS_ID = u.ID   
 	    WHERE m.MINUTE_SEQ = #{minute_seq}
 	</select>
+	<delete id="deleteMinutes">
+	    DELETE FROM MEETING_MINUTES WHERE MINUTE_SEQ = #{minute_seq}
+	</delete>
+	<update id="updateMinutes">
+	    UPDATE MEETING_MINUTES 
+	    SET 
+	        TITLE = #{title},
+	        MEETING_DT = #{meeting_dt},
+	        START_TIME = #{start_time},
+	        END_TIME = #{end_time},
+	        MAIN_CONTENT = #{main_content},
+	        DECISIONS = #{decisions, jdbcType=VARCHAR},
+			TODOS = #{todos, jdbcType=VARCHAR}
+	    WHERE MINUTE_SEQ = #{minute_seq}
+	</update>
 </mapper>

@@ -22,4 +22,13 @@ public class MeetingMinutesDAO {
 	public MeetingMinutesDTO getMinutesDetail(Long minute_seq) {
 		return mybatis.selectOne("MeetingMinutes.getMinutesDetail",minute_seq);
 	}
+	
+	public int deleteMinutes(Long minute_seq) {
+		return mybatis.delete("MeetingMinutes.deleteMinutes",minute_seq);
+	}
+	
+	public int updateMinutes(MeetingMinutesDTO dto) {
+		return mybatis.delete("MeetingMinutes.updateMinutes",dto);
+	}
+	
 }

@@ -9,7 +9,11 @@
 	    ) VALUES (
 	        ATTENDEE_SEQ.NEXTVAL,
 	        #{minute_seq},
-	        #{users_id}
+	        #{users_id, jdbcType=VARCHAR}
 	    )
 	</insert>
+	<delete id="deleteMinutesAttendees">
+	    DELETE FROM MINUTES_ATTENDEES WHERE MINUTE_SEQ = #{minute_seq}
+	</delete>
+	
 </mapper>
