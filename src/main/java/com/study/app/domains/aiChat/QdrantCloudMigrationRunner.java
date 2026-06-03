@@ -53,7 +53,7 @@ public class QdrantCloudMigrationRunner implements CommandLineRunner{
 	                .toBodilessEntity();
 
 	        System.out.println(
-	                "업로드 완료 : "
+	                "Qdrant Cloud 업로드 완료 : "
 	                + chunk.getChunk_seq());
 	    }
 	}
