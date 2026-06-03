@@ -48,4 +48,8 @@
 	<delete id="deleteAiChat">
 		delete from ai_chat where chat_seq = #{chat_seq}
 	</delete>
+	
+	<select id="myQuestions" resultType="com.study.app.domains.aiChat.AiUnansweredQuestionsDTO">
+		select * from ai_unanswered_questions where users_id = #{loginId}
+	</select>
 </mapper>

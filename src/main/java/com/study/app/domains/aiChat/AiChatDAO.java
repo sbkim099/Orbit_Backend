@@ -48,4 +48,8 @@ public class AiChatDAO {
 	public void deleteAiChat(Long chat_seq) {
 		batis.delete("AiChat.deleteAiChat", chat_seq);
 	}
+	
+	public List<AiUnansweredQuestionsDTO> myQuestions(String loginId) {
+		return batis.selectList("AiChat.myQuestions", loginId);
+	}
 }
