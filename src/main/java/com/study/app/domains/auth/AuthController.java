@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.study.app.util.JWTUtil;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("auth")
 public class AuthController {
@@ -25,7 +23,6 @@ public class AuthController {
 	private AuthService authServ;
 	
 	private final MailService mailServ;
-	
 	public AuthController(MailService mailService) {
         this.mailServ = mailService;
     }
@@ -51,7 +48,7 @@ public class AuthController {
 	}
 	
 	// 아이디 찾기 인증번호 발송 요청
-	@PostMapping("/requestMailForId")
+	@PostMapping("requestMailForId")
 	public ResponseEntity<?> requestMailForId(@RequestBody Map<String, String> request) {
 	    String name = request.get("name");
 	    String email = request.get("email");
@@ -65,8 +62,23 @@ public class AuthController {
 	    }
 	}
 
+	// 아이디 찾기
+    @PostMapping("findId")
+    public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        
+        String id = mailServ.findId(email, code);
+        
+        if (id != null) {
+            return ResponseEntity.ok(Map.of("success", true, "userId", id));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인증번호가 틀렸거나 만료되었습니다."));
+        }
+    }
+    
 	// 비밀번호 찾기 인증번호 발송 요청
-	@PostMapping("/requestMailForPw")
+	@PostMapping("requestMailForPw")
 	public ResponseEntity<?> requestMailForPw(@RequestBody Map<String, String> request) {
 	    String name = request.get("name");
 	    String id = request.get("id");
@@ -80,24 +92,9 @@ public class AuthController {
 	        return ResponseEntity.badRequest().body(Map.of("success", false, "message", "입력하신 정보와 일치하는 회원이 없습니다."));
 	    }
 	}
-    
-	 // 아이디 찾기
-    @PostMapping("/findId")
-    public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String code = request.get("code");
-        
-        String id = mailServ.findId(email, code);
-        
-        if (id != null) {
-            return ResponseEntity.ok(Map.of("success", true, "userId", id));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인증번호가 틀렸거나 만료되었습니다."));
-        }
-    }
 
     // 비밀번호 변경을 위한 토큰 발급
-    @PostMapping("/verifyForPw")
+    @PostMapping("verifyForPw")
     public ResponseEntity<?> verifyForPw(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String code = request.get("code");
@@ -112,7 +109,7 @@ public class AuthController {
     }
 
     // 비밀번호 변경
-    @PostMapping("/changePw")
+    @PostMapping("changePw")
     public ResponseEntity<?> changePw(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String newPw = request.get("newPw");

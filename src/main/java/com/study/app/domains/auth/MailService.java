@@ -6,20 +6,23 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.study.app.commons.EncryptionUtils;
 import com.study.app.domains.users.UsersDAO;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 @EnableScheduling
 public class MailService {
 	
 	@Autowired
-	private UsersDAO userDao;
+	private UsersDAO usersDao;
 	
 	private final JavaMailSender mailSender;
     // 서버 메모리에 이메일과 인증정보를 저장하는 맵
@@ -32,10 +35,8 @@ public class MailService {
     
     // 아이디 찾기용
     public boolean isExistForId(String name, String email) {
-        boolean isExist = userDao.isExistForId(name, email);
-
-        if (!isExist) {
-        	return false;
+    	if (usersDao.isExistForId(name, email) == 0) {
+            return false; 
         }
         sendMail(email);
         return true;
@@ -43,9 +44,7 @@ public class MailService {
 
     // 비밀번호 찾기용
     public boolean isExistForPw(String name, String id, String email) {
-        boolean isExist = userDao.isExistForPw(name, id, email);
-
-        if (!isExist) {
+    	if (usersDao.isExistForPw(name, id, email) == 0) {
             return false;
         }
         sendMail(email);
@@ -58,11 +57,33 @@ public class MailService {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(3);
         verificationStorage.put(email, new VerificationInfo(code, expiresAt));
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("[Orbit] 회원 인증 번호 안내");
-        message.setText("안녕하세요. 요청하신 인증번호는 [" + code + "] 입니다. 3분 이내에 입력해주세요.");
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom("sbkim099@naver.com");
+            helper.setTo(email);
+            helper.setSubject("[Orbit] 회원 인증 번호 안내");
+            helper.setText("""
+                <div style="font-family: sans-serif; max-width: 500px;">
+                    <h2 style="color: #3530B8;">Orbit 인증번호 안내</h2>
+                    <p>아래 인증번호를 3분 이내에 입력해주세요.</p>
+                    <div style="font-size: 32px; font-weight: bold; color: #3530B8; 
+                                background: #F0F4FF; padding: 20px; text-align: center;
+                                border-radius: 12px; letter-spacing: 8px;">
+                        %s
+                    </div>
+                    <p style="color: #999; font-size: 12px; margin-top: 16px;">
+                        본 메일은 발신 전용입니다.
+                    </p>
+                </div>
+            """.formatted(code), true); // true = HTML 사용
+            
+            mailSender.send(message);
+            
+        } catch (Exception e) {
+            throw new RuntimeException("메일 발송 실패", e);
+        }
     }
 
     // 아이디- 인증번호 검증 후 맞으면 ID 반환
@@ -76,7 +97,7 @@ public class MailService {
         if (info.getCode().equals(code)) {
             verificationStorage.remove(email);
             
-            return userDao.findIdByEmail(email);
+            return usersDao.findIdByEmail(email);
         }
         return null;
     }
@@ -100,12 +121,13 @@ public class MailService {
     }
 
     // 비밀번호 변경
-    public boolean changePassword(String email, String newPassword, String token) {
+    public boolean changePw(String email, String newPw, String token) {
         String savedToken = passwordResetTokens.get(email);
         if (savedToken != null && savedToken.equals(token)) {
             passwordResetTokens.remove(email);
-            // TODO: 실제 DB 패스워드 업데이트 처리 기입
-            System.out.println("성공: " + email + "의 비밀번호가 변경됨.");
+            
+            String pw = EncryptionUtils.getSha512(newPw);
+            usersDao.changePw(email, pw);
             return true;
         }
         return false;
