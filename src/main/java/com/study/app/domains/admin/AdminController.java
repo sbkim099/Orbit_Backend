@@ -176,4 +176,19 @@ public class AdminController {
 		docServ.addDoc(title, users_id, file);
 	    return ResponseEntity.ok().build();
 	}
+	
+	@PutMapping("editDocument")
+    public ResponseEntity<Void> editDocument(
+    		@RequestParam Long document_seq,
+            @RequestParam String title,
+            @RequestParam MultipartFile file) throws Exception {
+        docServ.editDoc(document_seq, title, file);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("deleteDocument/{document_seq}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long document_seq) {
+        docServ.deleteDoc(document_seq);
+        return ResponseEntity.ok().build();
+    }
 }
