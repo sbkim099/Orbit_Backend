@@ -362,10 +362,7 @@ public class AdminService {
 		return adminDao.myDeptQuestion(params);
 	}
 	
-	public void insertAnswer(Long question_seq, String handle_answer) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("question_seq", question_seq);
-		params.put("handle_answer", handle_answer);
-		adminDao.insertAnswer(params);
+	public void updateAnswer(AiUnansweredQuestionsDTO dto) {
+		adminDao.updateAnswer(dto);
 	}
 }
