@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
+import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.departments.DepartmentsCountDTO;
 import com.study.app.domains.departments.DepartmentsDAO;
 import com.study.app.domains.departments.DepartmentsDTO;
 import com.study.app.domains.departments.DeptLeaveDTO;
+import com.study.app.domains.documents.DocumentsDAO;
+import com.study.app.domains.documents.DocumentsDTO;
 import com.study.app.domains.rank.RankDAO;
 import com.study.app.domains.rank.RankDTO;
 import com.study.app.domains.signup.SignupDAO;
@@ -33,6 +36,10 @@ public class AdminService {
 	private SignupDAO signupDao;
 	@Autowired
 	private AdminDAO adminDao;
+	@Autowired
+	private AnnualLeaveDAO alDao;
+	@Autowired
+	private DocumentsDAO docDao;
 
 	public List<DepartmentsDTO> getDeptList() {
 		return departmentsDao.getDeptList();
@@ -66,6 +73,7 @@ public class AdminService {
 		dto.setRank_seq(request.getRank_seq());
 
 		usersDao.insertUser(dto);
+		alDao.insertAnnualLeave(signupInfo.getId());
 
 		signupDao.updateStatusToApproved(request.getSignup_seq());
 	}
@@ -147,8 +155,8 @@ public class AdminService {
 		return result;
 	}
 	
-	public List<AiUnansweredQuestionsDTO> getAiQuestions() {
-		return adminDao.getAiQuestions();
+	public List<DocumentsDTO> getAllDocs(){
+		return docDao.getAllDocs();
 	}
 	
 	
@@ -343,9 +351,9 @@ public class AdminService {
 	
 	
 	
-	
-	
-	
+	public List<AiUnansweredQuestionsDTO> getAiQuestions() {
+		return adminDao.getAiQuestions();
+	}
 	
 	public List<AiUnansweredQuestionsDTO> myDeptQuestion(Long dept_seq, String auth_group) {
 		Map<String, Object> params = new HashMap<>();

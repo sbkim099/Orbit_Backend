@@ -17,7 +17,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import com.google.common.net.HttpHeaders;
 
 @Service
 public class FileService {
@@ -27,6 +26,8 @@ public class FileService {
 	
 	@Value("${spring.cloud.gcp.bucket}")
 	private String bucketName;
+	@Value("${gcs.bucket.url}") 
+    private String bucketUrl;
 	
 	public Map<String, String> upload(MultipartFile file) throws Exception{
 		
@@ -45,7 +46,10 @@ public class FileService {
 
         result.put("oriname", oriname);
         result.put("sysname", sysname);
-
+        
+        String filePath = bucketUrl + "/" + sysname;
+        result.put("file_path", filePath);
+        
         return result;
 	}
 	
@@ -59,21 +63,26 @@ public class FileService {
 		return blob.getContent();
 	}
 	
-	// 첨부파일 다운로드 기능
-	public ResponseEntity<Resource> download(String sysname) throws Exception{
+	// 첨부파일 다운로드 및 미리보기
+	public byte[] getFileBytes(String sysname) throws Exception{
 		Blob blob = storage.get(BlobId.of(bucketName, sysname));
-		
-		if(blob == null || !blob.exists()) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		sysname = new String(sysname.getBytes("utf8"),"ISO-8859-1");
-		String oriname = sysname.split("_" ,2)[1];
-		
-		InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(blob.getContent()));
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + oriname + "\"")
-				.header(HttpHeaders.CONTENT_TYPE, blob.getContentType())
-				.body(resource);
+		        
+        if (blob == null || !blob.exists()) {
+            return null;
+        }
+        return blob.getContent();
+	}
+	
+	// 미리보기 전용
+	public String getMimeType(String sysname) {
+        Blob blob = storage.get(BlobId.of(bucketName, sysname));
+        if (blob == null || !blob.exists()) {
+            return null;
+        }
+        return blob.getContentType();
+    }
+	
+	public void deleteFromGCS(String sysname) {
+	    storage.delete(bucketName, sysname);
 	}
 }
