@@ -383,10 +383,16 @@ public class AdminController {
 		return ResponseEntity.ok(adminServ.myDeptQuestion(dept_seq, auth_group));
 	}
 	
-	@PostMapping("/ai/insertAnswer")
-	public ResponseEntity<Void> insertAnswer(
-			@RequestParam Long question_seq, @RequestParam String handle_answer) {
-		adminServ.insertAnswer(question_seq, handle_answer);
+	@PutMapping("/ai/insertUpdateAnswer")
+	public ResponseEntity<Void> insertUpdateAnswer(
+			@RequestBody AiUnansweredQuestionsDTO dto) {
+		adminServ.insertUpdateAnswer(dto);
+		return ResponseEntity.ok().build();
+	}
+	
+	@PutMapping("/ai/deleteAnswer/{question_seq}")
+	public ResponseEntity<Void> deleteAnswer(@PathVariable Long question_seq) {
+		adminServ.deleteAnswer(question_seq);
 		return ResponseEntity.ok().build();
 	}
 

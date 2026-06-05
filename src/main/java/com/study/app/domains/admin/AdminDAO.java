@@ -350,7 +350,11 @@ public class AdminDAO {
 		return batis.selectList("Admin.myDeptQuestion", params);
 	}
 	
-	public void insertAnswer(Map<String, Object> params) {
-		batis.insert("Admin.insertAnswer", params);
+	public void insertUpdateAnswer(AiUnansweredQuestionsDTO dto) {
+		batis.update("Admin.insertUpdateAnswer", dto);
+	}
+	
+	public void deleteAnswer(Long question_seq) {
+		batis.update("Admin.deleteAnswer", question_seq);
 	}
 }
