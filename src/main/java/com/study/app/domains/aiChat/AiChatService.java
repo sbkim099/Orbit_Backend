@@ -98,13 +98,13 @@ public class AiChatService {
 		// 출근 전 준비할 사항 : 0.8780443
 
 		double threshold = 0.53;
-		
+
 		List<SearchResultDTO> filteredDocs = similarDocs.stream()
-					.filter(doc -> doc.getScore() != null)
-					.filter(doc -> doc.getScore() >= threshold)
-					.limit(5)
-					.collect(Collectors.toList());
-		
+				.filter(doc -> doc.getScore() != null)
+				.filter(doc -> doc.getScore() >= threshold)
+				.limit(5)
+				.collect(Collectors.toList());
+
 		System.out.println("=================");
 		System.out.println("필터링 후 청크 수 : " + filteredDocs.size());
 		filteredDocs.forEach(doc -> {
@@ -118,7 +118,7 @@ public class AiChatService {
 			aiResult.put("chat_seq", chat_seq);
 
 			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
-							+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
+					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
 
 			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
@@ -176,6 +176,20 @@ public class AiChatService {
 		return aiResult;
 	}
 
+	public void embedDocument(Long fileSeq, Long docementSeq, String signedUrl) {
+		Map<String, Object> body = new HashMap<>();
+
+		body.put("fileSeq", fileSeq);
+		body.put("docementSeq", docementSeq);
+		body.put("signedUrl", signedUrl);
+
+		restClient.post()
+		.uri("/document/embed")
+		.body(body)
+		.retrieve()
+		.toBodilessEntity();
+	}
+
 	public List<AiChatDTO> sideChatTitleList(String loginId) {
 		return aiDao.sideChatTitleList(loginId);
 	}
@@ -183,17 +197,17 @@ public class AiChatService {
 	public List<AiMessagesDTO> detailChat(Long chat_seq) {
 		return aiDao.detailChat(chat_seq);
 	}
-	
+
 	public void insertQuestion(String loginId, 
 			AiUnansweredQuestionsDTO dto) {
 		Map<String, Object> params = new HashMap<>();
-		
+
 		params.put("users_id", loginId);
 		params.put("dto", dto);
-		
+
 		aiDao.insertQuestion(params);
 	}
-	
+
 	@Transactional
 	public void deleteChat(Long chat_seq) {
 		aiDao.deleteQuestions(chat_seq);
@@ -201,5 +215,5 @@ public class AiChatService {
 		aiDao.deleteAiChat(chat_seq);
 	}
 
-	
+
 }
