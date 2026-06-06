@@ -55,7 +55,7 @@ public class DocumentsService {
             Long file_seq = docFileDTO.getFile_seq();
             String signedUrl = fileServ.createSignedUrl(sysname);
             
-            aiChatServ.embedDocument(file_seq, document_seq, oriname, signedUrl, mime_type);
+            aiChatServ.createChunk(file_seq, document_seq, oriname, signedUrl, mime_type);
 
         } catch (Exception e) {
             throw new RuntimeException("문서 및 파일 등록 실패: " + e.getMessage(), e);

@@ -1,11 +1,13 @@
 package com.study.app.domains.aiChat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -43,7 +45,10 @@ public class AiChatService {
 
 	@Autowired
 	private AiChatDAO aiDao;
-
+	
+	@Autowired
+	private RagDAO ragDao;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -97,12 +102,12 @@ public class AiChatService {
 		// 이니셔티브별 현황 : 0.8592471
 		// 출근 전 준비할 사항 : 0.8780443
 
-		double threshold = 0.53;
+		double threshold = 0.20;
 
 		List<SearchResultDTO> filteredDocs = similarDocs.stream()
 				.filter(doc -> doc.getScore() != null)
 				.filter(doc -> doc.getScore() >= threshold)
-				.limit(5)
+				.limit(10)
 				.collect(Collectors.toList());
 
 		System.out.println("=================");
@@ -176,21 +181,84 @@ public class AiChatService {
 		return aiResult;
 	}
 
-	public void embedDocument(Long file_seq, Long document_seq, 
+	public void createChunk(Long file_seq, Long document_seq, 
 			String fileName, String signedUrl, String mimeType) {
 		Map<String, Object> body = new HashMap<>();
 
-		body.put("file_seq", file_seq);
-		body.put("document_seq", document_seq);
 		body.put("fileName", fileName);
 		body.put("signedUrl", signedUrl);
 		body.put("mimeType", mimeType);
 
-		restClient.post()
-		.uri("/document/embed")
-		.body(body)
-		.retrieve()
-		.toBodilessEntity();
+		ChunkResponseDTO response = 
+			restClient.post()
+			.uri("/document/chunk")
+			.body(body)
+			.retrieve()
+			.body(ChunkResponseDTO.class);
+		
+		RagDocumentsDTO ragDoc = new RagDocumentsDTO();
+		
+		ragDoc.setSource_type("DOCUMENTS");
+		ragDoc.setSource_seq(document_seq);
+		ragDoc.setFile_seq(file_seq);
+		ragDoc.setFile_name(fileName);
+		ragDoc.setFile_ext(FilenameUtils.getExtension(fileName));
+		ragDoc.setRaw_text(response.getRaw_text());
+		ragDoc.setExtract_status("DONE");
+		
+		ragDao.insertRagDocuments(ragDoc);
+		System.out.println("insert 후 ragDoc = " + ragDoc);
+		System.out.println("ragDocSeq = " + ragDoc.getRag_doc_seq());
+		
+		Long ragDocSeq = ragDoc.getRag_doc_seq();
+		System.out.println("embed 호출 전 = " + ragDocSeq);
+	    for(ChunkItemDTO chunk : response.getChunks()) {
+
+	        RagChunksDTO dto = new RagChunksDTO();
+
+	        dto.setRag_doc_seq(ragDocSeq);
+	        dto.setChunk_index(chunk.getChunk_index());
+	        dto.setChunk_text(chunk.getChunk_text());
+	        dto.setEmbed_status("PENDING");
+
+	        ragDao.insertRagChunks(dto);
+	    } 
+	    embedChunk(ragDocSeq, fileName);
+	}
+	
+	public void embedChunk(Long rag_doc_seq, String fileName) {
+		List<RagChunksDTO> chunks = ragDao.findChunksByRagDocSeq(rag_doc_seq);
+		
+		List<EmbedChunkDTO> items = new ArrayList<>();
+
+	    for(RagChunksDTO chunk : chunks) {
+	        EmbedChunkDTO dto = new EmbedChunkDTO();
+	        
+	        dto.setChunk_seq(chunk.getChunk_seq());
+	        dto.setRag_doc_seq(chunk.getRag_doc_seq());
+	        dto.setFile_name(fileName);
+	        dto.setChunk_text(chunk.getChunk_text());
+	        
+	        items.add(dto);
+	    }
+
+	    EmbedRequestDTO request = new EmbedRequestDTO();
+
+	    request.setChunks(items);
+
+	    EmbedResponseDTO response =
+	            restClient.post()
+	                    .uri("/embed/chunks")
+	                    .body(request)
+	                    .retrieve()
+	                    .body(EmbedResponseDTO.class);
+
+	    if(response != null && response.isSuccess()) {
+
+	        for(PointInfoDTO point : response.getPoints()) {
+	            ragDao.updateChunkEmbed(point.getChunk_seq(),point.getPoint_id());
+	        }
+	    }
 	}
 
 	public List<AiChatDTO> sideChatTitleList(String loginId) {
