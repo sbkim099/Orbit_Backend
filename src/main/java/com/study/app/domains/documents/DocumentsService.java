@@ -1,7 +1,7 @@
 package com.study.app.domains.documents;
 
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,5 +86,81 @@ public class DocumentsService {
         }
         dao.deleteDocFileByDocSeq(document_seq);
         dao.deleteDocument(document_seq);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    public List<DocumentsDTO> getAllDocs(){
+    	return dao.getAllDocs();
+    }
+    
+    public List<DocumentBookmarksDTO> getFavorites(String loginId){
+    	return dao.getFavorites(loginId);
+    }
+    
+    public void addFavorite(Long document_seq, String loginId) {
+    	dao.addFavorite(document_seq, loginId);
+    }
+    
+    public void removeFavorite(Long document_seq, String loginId) {
+    	dao.removeFavorite(document_seq, loginId);
     }
 }
