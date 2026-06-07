@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import com.study.app.domains.meetingMinutes.MeetingMinutesDTO;
+
 import jakarta.annotation.PostConstruct;
 import tools.jackson.databind.ObjectMapper;
 
@@ -45,10 +47,10 @@ public class AiChatService {
 
 	@Autowired
 	private AiChatDAO aiDao;
-	
+
 	@Autowired
 	private RagDAO ragDao;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -98,9 +100,6 @@ public class AiChatService {
 		System.out.println("=================");
 		System.out.println("최고 유사도 : " + maxScore);
 		System.out.println("=================");
-		// 연차 사용 : 0.7673025
-		// 이니셔티브별 현황 : 0.8592471
-		// 출근 전 준비할 사항 : 0.8780443
 
 		double threshold = 0.20;
 
@@ -190,14 +189,14 @@ public class AiChatService {
 		body.put("mimeType", mimeType);
 
 		ChunkResponseDTO response = 
-			restClient.post()
-			.uri("/document/chunk")
-			.body(body)
-			.retrieve()
-			.body(ChunkResponseDTO.class);
-		
+				restClient.post()
+				.uri("/document/chunk")
+				.body(body)
+				.retrieve()
+				.body(ChunkResponseDTO.class);
+
 		RagDocumentsDTO ragDoc = new RagDocumentsDTO();
-		
+
 		ragDoc.setSource_type("DOCUMENTS");
 		ragDoc.setSource_seq(document_seq);
 		ragDoc.setFile_seq(file_seq);
@@ -205,60 +204,127 @@ public class AiChatService {
 		ragDoc.setFile_ext(FilenameUtils.getExtension(fileName));
 		ragDoc.setRaw_text(response.getRaw_text());
 		ragDoc.setExtract_status("DONE");
+
+		ragDao.insertRagDocuments(ragDoc);
+
+		Long ragDocSeq = ragDoc.getRag_doc_seq();
+		for(ChunkItemDTO chunk : response.getChunks()) {
+
+			RagChunksDTO dto = new RagChunksDTO();
+
+			dto.setRag_doc_seq(ragDocSeq);
+			dto.setChunk_index(chunk.getChunk_index());
+			dto.setChunk_text(chunk.getChunk_text());
+			dto.setEmbed_status("PENDING");
+
+			ragDao.insertRagChunks(dto);
+		} 
+		embedChunk(ragDocSeq, fileName);
+	}
+
+	public void createMeetingChunk(MeetingMinutesDTO dto) {
+		String raw_text = 
+				"회의명 : " + dto.getTitle() + "\n\n" +
+						"[주요 내용] : " + dto.getMain_content() + "\n\n" +
+						"[결정 사항] : " + dto.getDecisions() + " \n\n" + 
+						"[할 일] : " + dto.getTodos();
+
+		RagDocumentsDTO ragDoc = new RagDocumentsDTO();
+
+		ragDoc.setSource_type("MEETING_MINUTES");
+		ragDoc.setSource_seq(dto.getMinute_seq());
+		ragDoc.setFile_seq(null);
+		ragDoc.setFile_name(dto.getTitle());
+		ragDoc.setFile_ext("MEETING");
+		ragDoc.setRaw_text(raw_text);
+		ragDoc.setExtract_status("DONE");
 		
 		ragDao.insertRagDocuments(ragDoc);
-		System.out.println("insert 후 ragDoc = " + ragDoc);
-		System.out.println("ragDocSeq = " + ragDoc.getRag_doc_seq());
-		
+
+
 		Long ragDocSeq = ragDoc.getRag_doc_seq();
-		System.out.println("embed 호출 전 = " + ragDocSeq);
-	    for(ChunkItemDTO chunk : response.getChunks()) {
 
-	        RagChunksDTO dto = new RagChunksDTO();
+		Long chunkIndex = 0L;
 
-	        dto.setRag_doc_seq(ragDocSeq);
-	        dto.setChunk_index(chunk.getChunk_index());
-	        dto.setChunk_text(chunk.getChunk_text());
-	        dto.setEmbed_status("PENDING");
+		if(dto.getMain_content() != null 
+				&& !dto.getMain_content().isEmpty()) {
+			RagChunksDTO mainChunk = new RagChunksDTO();
 
-	        ragDao.insertRagChunks(dto);
-	    } 
-	    embedChunk(ragDocSeq, fileName);
+			mainChunk.setRag_doc_seq(ragDocSeq);
+			mainChunk.setChunk_index(chunkIndex++);
+			mainChunk.setChunk_text(
+					"회의명 : " + dto.getTitle() + "\n" +
+					"회의 일자: " + dto.getMeeting_dt() + 
+					"\n\n[주요 내용]\n" + dto.getMain_content());
+			mainChunk.setEmbed_status("PENDING");
+			ragDao.insertRagChunks(mainChunk);
+		}
+
+
+		if(dto.getDecisions() != null 
+				&& !dto.getDecisions().isEmpty()) {
+			RagChunksDTO decisionChunk = new RagChunksDTO();
+
+			decisionChunk.setRag_doc_seq(ragDocSeq);
+			decisionChunk.setChunk_index(chunkIndex++);
+			decisionChunk.setChunk_text(
+					"회의명 : " + dto.getTitle() + "\n" +
+					"회의 일자: " + dto.getMeeting_dt() + 
+					"\n\n[결정 사항]\n" + dto.getDecisions());
+			decisionChunk.setEmbed_status("PENDING");
+			ragDao.insertRagChunks(decisionChunk);
+		}
+
+		if(dto.getTodos() != null 
+				&& !dto.getTodos().isEmpty()) {
+			RagChunksDTO todoChunk = new RagChunksDTO();
+
+			todoChunk.setRag_doc_seq(ragDocSeq);
+			todoChunk.setChunk_index(chunkIndex++);
+			todoChunk.setChunk_text(
+					"회의명 : " + dto.getTitle() + "\n" +
+					"회의 일자: " + dto.getMeeting_dt() + 
+					"\n\n[할 일]\n" + dto.getTodos());
+			todoChunk.setEmbed_status("PENDING");
+			ragDao.insertRagChunks(todoChunk);
+		}
+
+		embedChunk(ragDocSeq, dto.getTitle());
 	}
-	
+
 	public void embedChunk(Long rag_doc_seq, String fileName) {
 		List<RagChunksDTO> chunks = ragDao.findChunksByRagDocSeq(rag_doc_seq);
-		
+
 		List<EmbedChunkDTO> items = new ArrayList<>();
 
-	    for(RagChunksDTO chunk : chunks) {
-	        EmbedChunkDTO dto = new EmbedChunkDTO();
-	        
-	        dto.setChunk_seq(chunk.getChunk_seq());
-	        dto.setRag_doc_seq(chunk.getRag_doc_seq());
-	        dto.setFile_name(fileName);
-	        dto.setChunk_text(chunk.getChunk_text());
-	        
-	        items.add(dto);
-	    }
+		for(RagChunksDTO chunk : chunks) {
+			EmbedChunkDTO dto = new EmbedChunkDTO();
 
-	    EmbedRequestDTO request = new EmbedRequestDTO();
+			dto.setChunk_seq(chunk.getChunk_seq());
+			dto.setRag_doc_seq(chunk.getRag_doc_seq());
+			dto.setFile_name(fileName);
+			dto.setChunk_text(chunk.getChunk_text());
 
-	    request.setChunks(items);
+			items.add(dto);
+		}
 
-	    EmbedResponseDTO response =
-	            restClient.post()
-	                    .uri("/embed/chunks")
-	                    .body(request)
-	                    .retrieve()
-	                    .body(EmbedResponseDTO.class);
+		EmbedRequestDTO request = new EmbedRequestDTO();
 
-	    if(response != null && response.isSuccess()) {
+		request.setChunks(items);
 
-	        for(PointInfoDTO point : response.getPoints()) {
-	            ragDao.updateChunkEmbed(point.getChunk_seq(),point.getPoint_id());
-	        }
-	    }
+		EmbedResponseDTO response =
+				restClient.post()
+				.uri("/embed/chunks")
+				.body(request)
+				.retrieve()
+				.body(EmbedResponseDTO.class);
+
+		if(response != null && response.isSuccess()) {
+
+			for(PointInfoDTO point : response.getPoints()) {
+				ragDao.updateChunkEmbed(point.getChunk_seq(),point.getPoint_id());
+			}
+		}
 	}
 
 	public List<AiChatDTO> sideChatTitleList(String loginId) {

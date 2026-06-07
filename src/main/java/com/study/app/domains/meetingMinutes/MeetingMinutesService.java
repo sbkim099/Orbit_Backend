@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.study.app.domains.aiChat.AiChatService;
+
 @Service
 public class MeetingMinutesService {
 	@Autowired
@@ -14,6 +16,10 @@ public class MeetingMinutesService {
 	@Autowired
 	private MinutesAttendeesDAO minutesAttendeesDAO;
 	
+	@Autowired
+	private AiChatService aiChatServ;
+	
+	@Transactional
 	public int insertMinutes(MeetingMinutesDTO dto) {
 	    int result = minutesDAO.insertMinutes(dto);  // insert 후 dto.minuteSeq에 자동으로 생성된 seq 담김
 	    
@@ -23,6 +29,7 @@ public class MeetingMinutesService {
 	        	 minutesAttendeesDAO.insertMinutesAttendees(attendee);            
 	        }
 	    }
+	    aiChatServ.createMeetingChunk(dto);
 	    return result;		
 	}
 	

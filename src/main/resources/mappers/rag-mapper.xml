@@ -13,7 +13,7 @@
 		insert into rag_documents ( rag_doc_seq, source_type, source_seq, file_seq, file_name,
 		file_ext, raw_text, extract_status, created_at )
 		 
-		values ( #{rag_doc_seq}, #{source_type}, #{source_seq} , #{file_seq}, #{file_name}, #{file_ext}, #{raw_text},
+		values ( #{rag_doc_seq}, #{source_type}, #{source_seq} , #{file_seq, jdbcType=NUMERIC}, #{file_name}, #{file_ext}, #{raw_text},
 		#{extract_status}, sysdate )
 	</insert>
 
