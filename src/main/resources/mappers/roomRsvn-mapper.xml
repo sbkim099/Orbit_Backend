@@ -17,4 +17,11 @@
 	<delete id="deleteRsvn">
 		delete from room_rsvn where room_seq = #{room_seq}
 	</delete>
+	
+	<select id="getAllMyMeetRsvn" resultType="com.study.app.domains.meetingRooms.RoomRsvnDTO">
+		select m.room_name, r.* 
+		from room_rsvn r
+		left outer join meeting_rooms m on r.room_seq = m.room_seq
+		where r.users_id = #{users_id}
+	</select>
 </mapper>

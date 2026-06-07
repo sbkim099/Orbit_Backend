@@ -23,4 +23,8 @@ public class RoomRsvnDAO {
 	public void deleteRsvn(Long room_seq) {
 		mybatis.delete("RoomRsvn.deleteRsvn", room_seq);
 	}
+	
+	public List<RoomRsvnDTO> getAllMyMeetRsvn(String users_id) {
+		return mybatis.selectList("RoomRsvn.getAllMyMeetRsvn", users_id);
+	}
 }

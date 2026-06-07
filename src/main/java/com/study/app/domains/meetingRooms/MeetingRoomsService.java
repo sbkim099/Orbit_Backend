@@ -68,4 +68,8 @@ public class MeetingRoomsService {
 		
 		dao.deleteMeetingRoom(room_seq);
 	}
+	
+	public List<RoomRsvnDTO> getAllMyMeetRsvn(String loginId) {
+		return rsvnDao.getAllMyMeetRsvn(loginId);
+	}
 }
