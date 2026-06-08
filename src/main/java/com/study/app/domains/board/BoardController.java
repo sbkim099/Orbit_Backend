@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,6 +65,24 @@ public class BoardController {
         	e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("게시글 등록 중 오류가 발생했습니다.");
+        }
+    }
+    
+    /*댓글*/
+    @PostMapping("/{post_seq}/comments")
+    public ResponseEntity<String> insertComment(
+            @PathVariable Long post_seq,
+            @RequestAttribute String loginId,
+            @RequestBody BoardCommentsDTO comment) {
+        try {
+            comment.setPost_seq(post_seq);
+            comment.setUsers_id(loginId);
+            boardServ.insertComment(comment);
+            return ResponseEntity.ok("댓글이 등록되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("댓글 등록 중 오류가 발생했습니다.");
         }
     }
     
@@ -140,6 +159,12 @@ public class BoardController {
         }
     }
     
+    @DeleteMapping("/comments/{comment_seq}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long comment_seq){
+         boardServ.deleteComment(comment_seq);
+         return ResponseEntity.ok().build();
+    }
+    
     @PutMapping("/{post_seq}")
     public ResponseEntity<String> updatePost(
             @PathVariable Long post_seq,
@@ -148,7 +173,8 @@ public class BoardController {
             @RequestParam("title") String title,
             @RequestParam("content") String content,
             @RequestParam(value = "newFiles", required = false) List<MultipartFile> newFiles,
-            @RequestParam(value = "deletedFileSeqs", required = false) List<Long> deletedFileSeqs) {
+            @RequestParam(value = "deletedFileSeqs", required = false) List<Long> deletedFileSeqs,
+            @RequestParam(value = "deletedImageUrls", required = false) List<String> deletedImageUrls) {
         try {
             BoardPostsDTO post = new BoardPostsDTO();
             post.setPost_seq(post_seq);
@@ -156,12 +182,20 @@ public class BoardController {
             post.setTitle(title);
             post.setContent(content);
 
-            boardServ.updatePost(post, newFiles, deletedFileSeqs);
+            boardServ.updatePost(post, newFiles, deletedFileSeqs,deletedImageUrls);
             return ResponseEntity.ok("게시글이 수정되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("수정 중 오류가 발생했습니다.");
         }
+    }
+    
+    @PutMapping("/comments/{comment_seq}")
+    public ResponseEntity<Void> updateComment(@PathVariable Long comment_seq, 
+    										  @RequestBody BoardCommentsDTO dto){
+    	dto.setComment_seq(comment_seq);
+    	boardServ.updateComment(dto);
+    	return ResponseEntity.ok().build();
     }
 }

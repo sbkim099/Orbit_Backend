@@ -18,9 +18,13 @@ public class BoardPostsDTO {
     private String author_sysname;   
     //쿼리에 없
     private List<BoardFileDTO> files;
+    private List<BoardCommentsDTO> comments;
     
-    public BoardPostsDTO(Long post_seq, String title, String category, String content, String users_id, int view_count,
-			LocalDateTime created_at, String author_name, String author_sysname, List<BoardFileDTO> files) {
+    public BoardPostsDTO() {}
+
+	public BoardPostsDTO(Long post_seq, String title, String category, String content, String users_id, int view_count,
+			LocalDateTime created_at, String author_name, String author_sysname, List<BoardFileDTO> files,
+			List<BoardCommentsDTO> comments) {
 		super();
 		this.post_seq = post_seq;
 		this.title = title;
@@ -32,9 +36,8 @@ public class BoardPostsDTO {
 		this.author_name = author_name;
 		this.author_sysname = author_sysname;
 		this.files = files;
+		this.comments = comments;
 	}
-
-	public BoardPostsDTO() {}
 
 	public Long getPost_seq() {
 		return post_seq;
@@ -116,4 +119,12 @@ public class BoardPostsDTO {
 		this.files = files;
 	}
 
+	public List<BoardCommentsDTO> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<BoardCommentsDTO> comments) {
+		this.comments = comments;
+	}
+    
 }

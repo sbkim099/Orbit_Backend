@@ -64,4 +64,22 @@ public class BoardDAO {
     public void deleteFile(Long fileSeq) {
         mybatis.delete("Board.deleteFile", fileSeq);
     }
+    
+    /*--------------------댓글-------------------*/
+    public void insertComment(BoardCommentsDTO dto) {
+        mybatis.insert("Board.insertComment", dto);
+    }
+    
+    public List<BoardCommentsDTO> getComments(Long post_seq){
+    	return mybatis.selectList("Board.getComments",post_seq);
+    }
+    
+    public void deleteComment(Long comment_seq) {
+    	mybatis.delete("Board.deleteComment",comment_seq);
+    }
+    
+    public void updateComment(BoardCommentsDTO dto) {
+    	mybatis.update("Board.updateComment",dto);
+    }
+    
 }
