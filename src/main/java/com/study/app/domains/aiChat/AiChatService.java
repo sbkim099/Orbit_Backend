@@ -98,6 +98,7 @@ public class AiChatService {
 				.orElse(0.0);
 
 		System.out.println("=================");
+		System.out.println("질문 사항 : " + content);
 		System.out.println("최고 유사도 : " + maxScore);
 		System.out.println("=================");
 
