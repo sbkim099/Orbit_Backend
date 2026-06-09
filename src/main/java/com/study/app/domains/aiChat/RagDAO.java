@@ -56,5 +56,7 @@ public class RagDAO {
     	batis.delete("Rag.deleteRagDocumentsByRagDocSeq", rag_doc_seq);
     }
 	
-	
+	public List<RagDocumentsDTO> sourcesByRagDocSeqs(List<Long> ragDocSeqs) {
+		return batis.selectList("Rag.sourcesByRagDocSeq", ragDocSeqs);
+	}
 }

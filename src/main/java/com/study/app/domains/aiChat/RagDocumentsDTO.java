@@ -13,12 +13,14 @@ public class RagDocumentsDTO {
 	private String fail_reason;
 	private String extracted_at;
 	private String created_at;
+	private String sysname;
+	private String oriname;
 	
 	public RagDocumentsDTO() {}
 	
 	public RagDocumentsDTO(Long rag_doc_seq, String source_type, Long source_seq, Long file_seq, String file_name,
 			String file_ext, String raw_text, String extract_status, String fail_reason, String extracted_at,
-			String created_at) {
+			String created_at, String sysname, String oriname) {
 		super();
 		this.rag_doc_seq = rag_doc_seq;
 		this.source_type = source_type;
@@ -31,8 +33,10 @@ public class RagDocumentsDTO {
 		this.fail_reason = fail_reason;
 		this.extracted_at = extracted_at;
 		this.created_at = created_at;
+		this.sysname = sysname;
+		this.oriname = oriname;
 	}
-	
+
 	public Long getRag_doc_seq() {
 		return rag_doc_seq;
 	}
@@ -99,4 +103,21 @@ public class RagDocumentsDTO {
 	public void setCreated_at(String created_at) {
 		this.created_at = created_at;
 	}
+
+	public String getSysname() {
+		return sysname;
+	}
+
+	public void setSysname(String sysname) {
+		this.sysname = sysname;
+	}
+
+	public String getOriname() {
+		return oriname;
+	}
+
+	public void setOriname(String oriname) {
+		this.oriname = oriname;
+	}
+	
 }
