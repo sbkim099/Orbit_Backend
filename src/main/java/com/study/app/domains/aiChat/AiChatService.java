@@ -53,10 +53,10 @@ public class AiChatService {
 
 	@Autowired
 	private RagDAO ragDao;
-	
+
 	@Autowired
 	private MeetingMinutesDAO meetingMinutesDao;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -94,51 +94,11 @@ public class AiChatService {
 				.retrieve()
 				.body(new ParameterizedTypeReference<List<SearchResultDTO>>() {});
 
-		double maxScore = similarDocs.stream()
-				.map(SearchResultDTO::getScore)
-				.filter(Objects::nonNull)
-				.max(Double::compareTo)
-				.orElse(0.0);
-
-		System.out.println("=================");
-		System.out.println("질문 사항 : " + content);
-		System.out.println("최고 유사도 : " + maxScore);
-		System.out.println("=================");
-
 		List<SearchResultDTO> filteredDocs = similarDocs.stream()
 				.limit(5)
 				.collect(Collectors.toList());
 
-		System.out.println("=================");
-		System.out.println("청크 수 : " + filteredDocs.size());
-		filteredDocs.forEach(doc -> {
-			System.out.println("각 score : " + doc.getScore());
-			System.out.println("반환 내용 : " + doc.getText());
-			System.out.println("=================");
-		});
-		
-		List<Long> meetingSeqs = meetingMinutesDao.meetingSeqs(loginId);
-		
-		List<Long> ragDocSeqs = filteredDocs.stream()
-				.sorted(
-						Comparator.comparing(
-								SearchResultDTO::getScore
-								).reversed()
-						)
-				.map(SearchResultDTO::getRag_doc_seq)
-				.limit(3)
-				.distinct()
-				.toList();
-
-		List<RagDocumentsDTO> resultSources = ragDao.sourcesByRagDocSeqs(ragDocSeqs);
-		resultSources = resultSources.stream().filter(doc -> "DOCUMENTS".equals(doc.getSource_type())).toList();
-
-		if (filteredDocs.isEmpty() || maxScore < 0.20) {
-
-			System.out.println("검색 실패");
-			System.out.println("maxScore = " + maxScore);
-			System.out.println("filteredDocs.size = " + filteredDocs.size());
-
+		if (filteredDocs.isEmpty()) {
 			aiResult.put("chat_seq", chat_seq);
 			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
@@ -152,14 +112,105 @@ public class AiChatService {
 			return aiResult;
 		}
 
+		List<Long> ragDocSeq = filteredDocs.stream()
+				.map(SearchResultDTO::getRag_doc_seq)
+				.distinct()
+				.toList();
+
+		List<RagDocumentsDTO> meetingMinuteAuth = ragDao.sourcesByRagDocSeqs(ragDocSeq);
+		List<Long> meetingSeqs = meetingMinutesDao.meetingSeqs(loginId);
+
+		Map<Long, RagDocumentsDTO> meetingMinuteAuthMap = meetingMinuteAuth.stream()
+				.collect(Collectors.toMap(
+						RagDocumentsDTO::getRag_doc_seq,
+						rag -> rag
+						));
+
+		filteredDocs = filteredDocs.stream()
+				.filter(doc -> {
+					RagDocumentsDTO result = meetingMinuteAuthMap.get(doc.getRag_doc_seq());
+
+					if ("DOCUMENTS".equals(result.getSource_type())) {
+						return true;
+					}
+
+					return meetingSeqs.contains(
+							result.getSource_seq()
+							);
+				})
+				.collect(Collectors.toList());
+
+		if (filteredDocs.isEmpty()) {
+			aiResult.put("chat_seq", chat_seq);
+			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
+					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
+
+			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
+					aiAnswer,null,null,null));
+
+			aiResult.put("aiAnswer", aiAnswer);
+			aiResult.put("resultSources", Collections.emptyList());
+
+			return aiResult;
+		}
+
+		double maxScore = similarDocs.stream()
+				.map(SearchResultDTO::getScore)
+				.filter(Objects::nonNull)
+				.max(Double::compareTo)
+				.orElse(0.0);
+
+		if (maxScore < 0.20) {
+			aiResult.put("chat_seq", chat_seq);
+			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
+					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
+
+			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
+					aiAnswer,null,null,null));
+
+			aiResult.put("aiAnswer", aiAnswer);
+			aiResult.put("resultSources", Collections.emptyList());
+
+			return aiResult;
+		}
+
+		System.out.println("= = = = = = 질문 사항 = = = = =");
+		System.out.println(content);
+		System.out.println("= = = = = = 최고 유사도 = = = = =");
+		System.out.println(maxScore);
+
+
+		System.out.println("= = = = = = 청크 수 = = = = =");
+		System.out.println(filteredDocs.size());
+		filteredDocs.forEach(doc -> {
+			System.out.println("각 score : " + doc.getScore());
+			System.out.println("반환 내용 : " + doc.getText());
+			System.out.println("= = = = = = = = = = = = = =");
+		});
+
+		List<Long> ragDocSeqs = filteredDocs.stream()
+				.sorted(
+						Comparator.comparing(
+								SearchResultDTO::getScore
+								).reversed()
+						)
+				.map(SearchResultDTO::getRag_doc_seq)
+				.limit(3)
+				.distinct()
+				.toList();
+
+		List<RagDocumentsDTO> resultSources = ragDao.sourcesByRagDocSeqs(ragDocSeqs);
+		resultSources = resultSources.stream()
+				.filter(doc -> "DOCUMENTS".equals(doc.getSource_type()))
+				.toList();
+
 		List<Long> refChunkIds = filteredDocs.stream()
 				.map(SearchResultDTO::getChunk_seq)
 				.toList();
 
 		String dbRefChunkValue;
 		try {
-			dbRefChunkValue =
-					objectMapper.writeValueAsString(refChunkIds);
+			dbRefChunkValue = objectMapper.writeValueAsString(refChunkIds);
 		} catch (Exception e) {
 			dbRefChunkValue = "[]";
 		}
@@ -167,38 +218,38 @@ public class AiChatService {
 		String context = filteredDocs.stream()
 				.map(SearchResultDTO::getText)
 				.collect(Collectors.joining("\n\n"));
-		String systemPrompt;
 
+		String systemPrompt;
 		if(context.contains("회의명 :")) {
 			systemPrompt ="당신은 사내 그룹웨어 시스템의 스마트 업무 지원 AI 비서이자, 프로페셔널한 회의록 요약 전문가입니다."
-		            + "제공된 [회의록 데이터]만을 바탕으로, 임직원들이 회의 핵심 내용을 한눈에 파악할 수 있도록 정중하고 객관적으로 답변해야 합니다."
-		            + ""
-		            + "[사용자 의도 파악 및 유연한 대응 규칙 (필수)]"
-		            + "1. **[전체 요약 요청 시]**: 사용자가 회의록의 '전체 요약'을 원하거나 특정 항목을 지정하지 않은 경우, 아래의 **[지정된 출력 형식]** 4가지를 모두 사용하여 답변하세요."
-		            + "2. **[특정 항목 요청 시]**: 사용자가 특정 내용만 딱 집어서 질문한 경우(예: \"결정 사항만 알려줘\", \"할 일이 뭐야?\", \"어떤 내용이 논의됐어?\"), 요구하지 않은 다른 분류는 과감히 생략하고 **사용자가 요청한 핵심 항목의 내용과 핵심 개요의 내용을 추출하여 답변**하세요. (예: 할 일만 물었다면 '*회의 개요와 *할 일' 내용만 출력)"
-		            + ""
-		            + "[회의록 요약 가이드라인 및 주의사항]"
-		            + "1. **[핵심 중심 요약]**: 회의 중 발생한 단순 인사말, 잡담, 지엽적인 의견 대립 과정 등의 노이즈는 과감히 제외하고, '최종 결론'과 '합의된 사항'을 중심으로 요약하세요."
-		            + "2. **[구체성 유지]**: 주요 논의 내용이나 결정 사항을 작성할 때, 대화의 맥락을 알 수 있도록 구체적인 배경이나 이유를 포함하여 서술하세요. 단어만 나열하는 무성의한 요약은 금지합니다."
-		            + "3. **[담당자 및 기한 명시]**: 할 일을 작성할 때는 회의록에 언급된 **담당자 이름(또는 부서)**과 **완료 목표 기한(Due Date)**을 데이터에서 찾아 명확하게 매칭하여 기록하세요."
-		            + "4. **[엄격한 사실 근거]**: 데이터에 존재하지 않는 내용이나 회의 중 확정되지 않은 추측성 정보, 일반 상식을 답변에 절대 추가하지 마십시오. 오직 제공된 [회의록 데이터]의 내용으로만 답변해야 합니다."
-		            + "5. **[예외 처리]**: 제공된 [회의록 데이터]가 유저가 요청한 질문이나 특정 회의 내용과 전혀 관련이 없거나, 핵심 정보가 부족한 경우 추측하여 답변하지 마십시오."
-		            + " 이 경우에는 반드시 유저의 질문을 포함해 '사내 데이터베이스에서 (유저질문) 와(과) 관련된 회의록 규정이나 내용을 찾지 못했습니다. 😢'라고 답하십시오."
-		            + "6. 임직원을 대하는 격식있고 명확한 비즈니스 어조(한글 존댓말)를 유지하세요. 답변의 마지막에는 항상 '추가로 궁금하신 사항이 있으시면 언제든 말씀해 주시길 바랍니다.'라는 정중한 맺음말을 붙이십시오."
-		            + "7. **[출력 포맷팅]**: 임직원이 보기 편하도록 항목별 줄바꿈을 적극 활용하고, 소분류나 상세 내용에는 -(하이픈)을 활용하여 가독성 높게 출력하세요."
-		            + ""
-		            + "[지정된 출력 형식 (전체 요약용)]"
-		            + "1. 회의 개요"
-		            + "- 회의명, 일시 등 개요 정보 요약"
-		            + "2. 주요 내용"
-		            + "- 회의에서 다루어진 핵심 안건과 논의 배경"
-		            + "3. 결정 사항"
-		            + "- 합의된 최종 결론 및 승인된 사항"
-		            + "4. 할 일"
-		            + "- 담당자, 구체적인 실행 과제, 완료 기한"
-		            + ""
-		            + "[회의록 데이터]"
-		            + "%s".formatted(context);
+					+ "제공된 [회의록 데이터]만을 바탕으로, 임직원들이 회의 핵심 내용을 한눈에 파악할 수 있도록 정중하고 객관적으로 답변해야 합니다."
+					+ ""
+					+ "[사용자 의도 파악 및 유연한 대응 규칙 (필수)]"
+					+ "1. **[전체 요약 요청 시]**: 사용자가 회의록의 '전체 요약'을 원하거나 특정 항목을 지정하지 않은 경우, 아래의 **[지정된 출력 형식]** 4가지를 모두 사용하여 답변하세요."
+					+ "2. **[특정 항목 요청 시]**: 사용자가 특정 내용만 딱 집어서 질문한 경우(예: \"결정 사항만 알려줘\", \"할 일이 뭐야?\", \"어떤 내용이 논의됐어?\"), 요구하지 않은 다른 분류는 과감히 생략하고 **사용자가 요청한 핵심 항목의 내용과 핵심 개요의 내용을 추출하여 답변**하세요. (예: 할 일만 물었다면 '*회의 개요와 *할 일' 내용만 출력)"
+					+ ""
+					+ "[회의록 요약 가이드라인 및 주의사항]"
+					+ "1. **[핵심 중심 요약]**: 회의 중 발생한 단순 인사말, 잡담, 지엽적인 의견 대립 과정 등의 노이즈는 과감히 제외하고, '최종 결론'과 '합의된 사항'을 중심으로 요약하세요."
+					+ "2. **[구체성 유지]**: 주요 논의 내용이나 결정 사항을 작성할 때, 대화의 맥락을 알 수 있도록 구체적인 배경이나 이유를 포함하여 서술하세요. 단어만 나열하는 무성의한 요약은 금지합니다."
+					+ "3. **[담당자 및 기한 명시]**: 할 일을 작성할 때는 회의록에 언급된 **담당자 이름(또는 부서)**과 **완료 목표 기한(Due Date)**을 데이터에서 찾아 명확하게 매칭하여 기록하세요."
+					+ "4. **[엄격한 사실 근거]**: 데이터에 존재하지 않는 내용이나 회의 중 확정되지 않은 추측성 정보, 일반 상식을 답변에 절대 추가하지 마십시오. 오직 제공된 [회의록 데이터]의 내용으로만 답변해야 합니다."
+					+ "5. **[예외 처리]**: 제공된 [회의록 데이터]가 유저가 요청한 질문이나 특정 회의 내용과 전혀 관련이 없거나, 핵심 정보가 부족한 경우 추측하여 답변하지 마십시오."
+					+ " 이 경우에는 반드시 유저의 질문을 포함해 '사내 데이터베이스에서 (유저질문) 와(과) 관련된 회의록 규정이나 내용을 찾지 못했습니다. 😢'라고 답하십시오."
+					+ "6. 임직원을 대하는 격식있고 명확한 비즈니스 어조(한글 존댓말)를 유지하세요. 답변의 마지막에는 항상 '추가로 궁금하신 사항이 있으시면 언제든 말씀해 주시길 바랍니다.'라는 정중한 맺음말을 붙이십시오."
+					+ "7. **[출력 포맷팅]**: 임직원이 보기 편하도록 항목별 줄바꿈을 적극 활용하고, 소분류나 상세 내용에는 -(하이픈)을 활용하여 가독성 높게 출력하세요."
+					+ ""
+					+ "[지정된 출력 형식 (전체 요약용)]"
+					+ "1. 회의 개요"
+					+ "- 회의명, 일시 등 개요 정보 요약"
+					+ "2. 주요 내용"
+					+ "- 회의에서 다루어진 핵심 안건과 논의 배경"
+					+ "3. 결정 사항"
+					+ "- 합의된 최종 결론 및 승인된 사항"
+					+ "4. 할 일"
+					+ "- 담당자, 구체적인 실행 과제, 완료 기한"
+					+ ""
+					+ "[회의록 데이터]"
+					+ "%s".formatted(context);
 		}else {
 			systemPrompt = "당신은 사내 그룹웨어 시스템의 스마트 업무 지원 AI 비서입니다."
 					+ "임직원이 안심하고 업무 가이드를 얻을 수 있도록, 아래 제공된 [사내 문서 데이터]만을 바탕으로 정중하고 객관적으로 답변해야 합니다."
@@ -229,7 +280,7 @@ public class AiChatService {
 					+ "[사내 문서 데이터]"
 					+ "%s".formatted(context);
 		}
-		
+
 		Prompt prompt = new Prompt(List.of(
 				new SystemMessage(systemPrompt),
 				new UserMessage(content)));

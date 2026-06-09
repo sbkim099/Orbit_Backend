@@ -71,7 +71,7 @@
 		delete from rag_documents where rag_doc_seq = #{rag_doc_seq}
 	</delete>
 	
-	<select id="sourcesByRagDocSeq" resultType="com.study.app.domains.aiChat.RagDocumentsDTO">
+	<select id="sourcesByRagDocSeqs" resultType="com.study.app.domains.aiChat.RagDocumentsDTO">
 		select r.rag_doc_seq, r.source_type, r.source_seq, r.file_name, f.file_sysname as sysname, f.file_oriname as oriname
 			from rag_documents r
 			left join document_files f on f.file_seq = r.file_seq

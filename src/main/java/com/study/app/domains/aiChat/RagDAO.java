@@ -57,6 +57,6 @@ public class RagDAO {
     }
 	
 	public List<RagDocumentsDTO> sourcesByRagDocSeqs(List<Long> ragDocSeqs) {
-		return batis.selectList("Rag.sourcesByRagDocSeq", ragDocSeqs);
+		return batis.selectList("Rag.sourcesByRagDocSeqs", ragDocSeqs);
 	}
 }
