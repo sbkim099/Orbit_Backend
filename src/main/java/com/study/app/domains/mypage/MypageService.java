@@ -11,6 +11,7 @@ import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.annualLeave.AnnualLeaveDTO;
 import com.study.app.domains.meetingRooms.MeetingRoomsDTO;
 import com.study.app.domains.meetingRooms.MeetingRoomsService;
+import com.study.app.domains.meetingRooms.OccupiedTimeDTO;
 import com.study.app.domains.meetingRooms.RoomRsvnDTO;
 
 @Service
@@ -47,7 +48,11 @@ public class MypageService {
 		return roomServ.getAllRooms();
 	}
 	
-	public List<String> getOccupiedTimes(Long room_seq, String date, Long rsvn_seq) {
+	public List<OccupiedTimeDTO> getOccupiedTimes(Long room_seq, String date, Long rsvn_seq) {
 		return roomServ.getOccupiedTimes(room_seq, date, rsvn_seq);
+	}
+	
+	public void updateMeetRsvn(RoomRsvnDTO dto) {
+		roomServ.updateMeetRsvn(dto);
 	}
 }

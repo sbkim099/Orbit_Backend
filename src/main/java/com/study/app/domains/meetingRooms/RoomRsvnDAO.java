@@ -49,11 +49,29 @@ public class RoomRsvnDAO {
 		return mybatis.selectList("RoomRsvn.getMeetRsvnDetail", rsvn_seq);
 	}
 	
-	public List<String> getOccupiedTimes(Long room_seq, String date, Long rsvn_seq) {
+	public List<OccupiedTimeDTO> getOccupiedTimes(Long room_seq, String date, Long rsvn_seq) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("room_seq", room_seq);
 		params.put("date", date);
 		params.put("rsvn_seq", rsvn_seq);
 		return mybatis.selectList("RoomRsvn.getOccupiedTimes", params);
+	}
+	
+	public void updateMeetRsvn(RoomRsvnDTO dto) {
+		mybatis.update("RoomRsvn.updateMeetRsvn", dto);
+	}
+	
+	public void removeRsvnMember(Long rsvn_seq, String users_id) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("rsvn_seq", rsvn_seq);
+		params.put("users_id", users_id);
+		mybatis.delete("RoomRsvn.removeRsvnMember", params);
+	}
+	
+	public void insertAddMember(Long rsvn_seq, String users_id) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("rsvn_seq", rsvn_seq);
+		params.put("users_id", users_id);
+		mybatis.delete("RoomRsvn.insertAddMember", params);
 	}
 }

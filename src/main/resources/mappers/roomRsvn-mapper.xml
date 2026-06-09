@@ -77,4 +77,18 @@
 			and TRUNC(start_dt) = TO_DATE(#{date}, 'YYYY-MM-DD')
 			and rsvn_seq != #{rsvn_seq}
 	</select>
+	
+	<update id="updateMeetRsvn">
+		update room_rsvn set 
+			room_seq = #{room_seq}, title = #{title}, start_dt = #{start_dt}, end_dt = #{end_dt} 
+		where rsvn_seq = #{rsvn_seq}
+	</update>
+	
+	<delete id="removeRsvnMember">
+		delete from room_rsvn_member where rsvn_seq = #{rsvn_seq} and users_id = #{users_id}
+	</delete>
+	
+	<insert id="insertAddMember">
+		insert into room_rsvn_member values (rm_seq.nextval, #{rsvn_seq}, #{users_id})
+	</insert>
 </mapper>

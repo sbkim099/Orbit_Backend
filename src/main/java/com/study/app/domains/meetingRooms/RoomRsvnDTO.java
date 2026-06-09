@@ -15,10 +15,13 @@ public class RoomRsvnDTO {
 	private String sysname;
 	private String room_name;
 	private List<RoomRsvnMemberDTO> attendees;
+	private List<RoomRsvnMemberDTO> removedAttendees;
+	private List<RoomRsvnMemberDTO> addedAttendees;
 	
 	public RoomRsvnDTO() {}
 	public RoomRsvnDTO(Long rsvn_seq, Long room_seq, String users_id, String title, String start_dt, String end_dt,
-			String created_at, String name, String sysname, String room_name, List<RoomRsvnMemberDTO> attendees) {
+			String created_at, String name, String sysname, String room_name, List<RoomRsvnMemberDTO> attendees,
+			List<RoomRsvnMemberDTO> removedAttendees, List<RoomRsvnMemberDTO> addedAttendees) {
 		super();
 		this.rsvn_seq = rsvn_seq;
 		this.room_seq = room_seq;
@@ -31,6 +34,8 @@ public class RoomRsvnDTO {
 		this.sysname = sysname;
 		this.room_name = room_name;
 		this.attendees = attendees;
+		this.removedAttendees = removedAttendees;
+		this.addedAttendees = addedAttendees;
 	}
 	public Long getRsvn_seq() {
 		return rsvn_seq;
@@ -97,5 +102,17 @@ public class RoomRsvnDTO {
 	}
 	public void setAttendees(List<RoomRsvnMemberDTO> attendees) {
 		this.attendees = attendees;
+	}
+	public List<RoomRsvnMemberDTO> getRemovedAttendees() {
+		return removedAttendees;
+	}
+	public void setRemovedAttendees(List<RoomRsvnMemberDTO> removedAttendees) {
+		this.removedAttendees = removedAttendees;
+	}
+	public List<RoomRsvnMemberDTO> getAddedAttendees() {
+		return addedAttendees;
+	}
+	public void setAddedAttendees(List<RoomRsvnMemberDTO> addedAttendees) {
+		this.addedAttendees = addedAttendees;
 	}
 }
