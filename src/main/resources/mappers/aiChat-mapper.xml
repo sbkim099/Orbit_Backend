@@ -15,7 +15,7 @@
 	</update>
 	
 	<insert id="insertMessage">
-		insert into ai_messages values(msg_seq.nextval, #{chat_seq}, #{role}, #{content}, #{ref_chunk_ids, jdbcType=VARCHAR}, sysdate)
+		insert into ai_messages values(msg_seq.nextval, #{chat_seq}, #{role}, #{content}, #{ref_chunk_ids, jdbcType=VARCHAR}, sysdate, #{ref_rag_doc_seq, jdbcType=VARCHAR})
 	</insert>
 	
 	<select id="sideChatTitleList" resultType="com.study.app.domains.aiChat.AiChatDTO">
@@ -24,7 +24,7 @@
 	</select>
 	
 	<select id="detailChat" resultType="com.study.app.domains.aiChat.AiMessagesDTO">
-		select a.role, a.content, q.status
+		select a.role, a.content, a.ref_rag_doc_seq, q.status
 		from ai_messages a
 		left join ai_unanswered_questions q on a.chat_seq = q.chat_seq
 		where a.chat_seq = #{chat_seq}

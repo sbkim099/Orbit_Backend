@@ -1,6 +1,7 @@
 package com.study.app.domains.aiChat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -78,7 +79,7 @@ public class AiChatService {
 			aiDao.updateAiChatUpdated_at(chat_seq);
 		}
 
-		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, role, content, null, null,null));
+		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, role, content, null, null, null, null));
 
 		Map<String, Object> aiResult = new HashMap<>();
 		aiResult.put("chat_seq", chat_seq);
@@ -103,8 +104,8 @@ public class AiChatService {
 			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
-					aiAnswer,null,null,null));
+			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
+					aiAnswer, null, null, null, null));
 
 			aiResult.put("aiAnswer", aiAnswer);
 			aiResult.put("resultSources", Collections.emptyList());
@@ -112,12 +113,12 @@ public class AiChatService {
 			return aiResult;
 		}
 
-		List<Long> ragDocSeq = filteredDocs.stream()
+		List<Long> authRagDocSeqs = filteredDocs.stream()
 				.map(SearchResultDTO::getRag_doc_seq)
 				.distinct()
 				.toList();
 
-		List<RagDocumentsDTO> meetingMinuteAuth = ragDao.sourcesByRagDocSeqs(ragDocSeq);
+		List<RagDocumentsDTO> meetingMinuteAuth = ragDao.sourcesByRagDocSeqs(authRagDocSeqs);
 		List<Long> meetingSeqs = meetingMinutesDao.meetingSeqs(loginId);
 
 		Map<Long, RagDocumentsDTO> meetingMinuteAuthMap = meetingMinuteAuth.stream()
@@ -140,13 +141,24 @@ public class AiChatService {
 				})
 				.collect(Collectors.toList());
 
+		List<Long> ragDocSeqs = filteredDocs.stream()
+				.sorted(
+						Comparator.comparing(
+								SearchResultDTO::getScore
+								).reversed()
+						)
+				.map(SearchResultDTO::getRag_doc_seq)
+				.limit(3)
+				.distinct()
+				.toList();
+
 		if (filteredDocs.isEmpty()) {
 			aiResult.put("chat_seq", chat_seq);
 			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
-					aiAnswer,null,null,null));
+			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
+					aiAnswer, null, null, null, null));
 
 			aiResult.put("aiAnswer", aiAnswer);
 			aiResult.put("resultSources", Collections.emptyList());
@@ -165,8 +177,8 @@ public class AiChatService {
 			String aiAnswer = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L,chat_seq,"AI",
-					aiAnswer,null,null,null));
+			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
+					aiAnswer, null, null, null, null));
 
 			aiResult.put("aiAnswer", aiAnswer);
 			aiResult.put("resultSources", Collections.emptyList());
@@ -188,16 +200,7 @@ public class AiChatService {
 			System.out.println("= = = = = = = = = = = = = =");
 		});
 
-		List<Long> ragDocSeqs = filteredDocs.stream()
-				.sorted(
-						Comparator.comparing(
-								SearchResultDTO::getScore
-								).reversed()
-						)
-				.map(SearchResultDTO::getRag_doc_seq)
-				.limit(3)
-				.distinct()
-				.toList();
+
 
 		List<RagDocumentsDTO> resultSources = ragDao.sourcesByRagDocSeqs(ragDocSeqs);
 		resultSources = resultSources.stream()
@@ -209,12 +212,15 @@ public class AiChatService {
 				.toList();
 
 		String dbRefChunkValue;
+		String dbRefRagDocValue;
 		try {
 			dbRefChunkValue = objectMapper.writeValueAsString(refChunkIds);
+			dbRefRagDocValue = objectMapper.writeValueAsString(ragDocSeqs);
 		} catch (Exception e) {
 			dbRefChunkValue = "[]";
+			dbRefRagDocValue = "[]";
 		}
-
+		
 		String context = filteredDocs.stream()
 				.map(SearchResultDTO::getText)
 				.collect(Collectors.joining("\n\n"));
@@ -293,9 +299,13 @@ public class AiChatService {
 		}else {
 			aiResult.put("resultSources", resultSources);
 		}
-		System.out.println(dbRefChunkValue);
 
-		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI", aiAnswer, dbRefChunkValue, null, null));
+		System.out.println("= = = = = = = = = = = = = =");
+		System.out.println(dbRefChunkValue);
+		System.out.println(dbRefRagDocValue);
+		System.out.println("= = = = = = = = = = = = = =");
+		
+		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI", aiAnswer, dbRefChunkValue, null, null, dbRefRagDocValue));
 		aiResult.put("aiAnswer", aiAnswer);
 		return aiResult;
 	}
@@ -448,8 +458,36 @@ public class AiChatService {
 	}
 
 	public List<AiMessagesDTO> detailChat(Long chat_seq) {
-		return aiDao.detailChat(chat_seq);
+		List<AiMessagesDTO> chatResult = aiDao.detailChat(chat_seq);
+		
+		for(AiMessagesDTO msg : chatResult) {
+
+		    if(msg.getRef_rag_doc_seq() == null) {
+		        continue;
+		    }
+
+		    String value = msg.getRef_rag_doc_seq();
+
+		    List<Long> ragDocSeqs =
+		            Arrays.stream(
+		                    value.replace("[", "")
+		                         .replace("]", "")
+		                         .split(",")
+		            )
+		            .map(String::trim)
+		            .filter(s -> !s.isEmpty())
+		            .map(Long::parseLong)
+		            .toList();
+
+		    List<RagDocumentsDTO> sources =
+		            ragDao.sourcesByRagDocSeqs(ragDocSeqs);
+
+		    msg.setResultSources(sources);
+		}
+
+	    return chatResult;
 	}
+	
 
 	public void insertQuestion(String loginId, 
 			AiUnansweredQuestionsDTO dto) {
