@@ -69,8 +69,11 @@
 		where r.rsvn_seq = #{rsvn_seq}
 	</select>
 	
-	<select id="getOccupiedTimes" resultType="String">
-		select TO_CHAR(start_dt, 'HH24:MI') from room_rsvn where room_seq = #{room_seq}
+	<select id="getOccupiedTimes" resultType="com.study.app.domains.meetingRooms.OccupiedTimeDTO">
+		select 
+			TO_CHAR(start_dt, 'HH24:MI') as startTime,
+			TO_CHAR(end_dt, 'HH24:MI') as endTime
+		from room_rsvn where room_seq = #{room_seq}
 			and TRUNC(start_dt) = TO_DATE(#{date}, 'YYYY-MM-DD')
 			and rsvn_seq != #{rsvn_seq}
 	</select>
