@@ -181,8 +181,7 @@ public class AiChatService {
 		return aiResult;
 	}
 
-	public void createChunk(Long file_seq, Long document_seq, 
-			String fileName, String signedUrl, String mimeType) {
+	public void createChunk(Long file_seq, Long document_seq, String fileName, String signedUrl, String mimeType) {
 		Map<String, Object> body = new HashMap<>();
 
 		body.put("fileName", fileName);

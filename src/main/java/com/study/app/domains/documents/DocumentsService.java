@@ -66,8 +66,9 @@ public class DocumentsService {
 	@Transactional
     public void editDoc(Long document_seq, String title, MultipartFile file) throws Exception {
         dao.updateDocumentTitle(document_seq, title);
-
+        
         if (file != null && !file.isEmpty()) {
+        	aiChatServ.deleteDocumentRag(document_seq);
             DocumentsFilesDTO oldFile = dao.findFileByDocSeq(document_seq);
             if (oldFile != null) {
                 fileServ.deleteFromGCS(oldFile.getFile_sysname());
@@ -84,6 +85,11 @@ public class DocumentsService {
             docFileDTO.setMime_type(file.getContentType());
 
             dao.insertDocFile(docFileDTO);
+            
+            Long file_seq = docFileDTO.getFile_seq();
+            String signedUrl = fileServ.createSignedUrl(docFileDTO.getFile_sysname());
+            
+            aiChatServ.createChunk(file_seq, document_seq, docFileDTO.getFile_oriname(), signedUrl, docFileDTO.getMime_type());
         }
     }
 
@@ -97,66 +103,6 @@ public class DocumentsService {
         dao.deleteDocFileByDocSeq(document_seq);
         dao.deleteDocument(document_seq);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
     public List<DocumentsDTO> getAllDocs(){
     	return dao.getAllDocs();
