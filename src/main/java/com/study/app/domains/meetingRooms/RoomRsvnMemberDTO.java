@@ -5,12 +5,17 @@ public class RoomRsvnMemberDTO {
 	private Long rsvn_seq;
 	private String users_id;
 	
+	private String name;
+	private String sysname;
+	
 	public RoomRsvnMemberDTO() {}
-	public RoomRsvnMemberDTO(Long rm_seq, Long rsvn_seq, String users_id) {
+	public RoomRsvnMemberDTO(Long rm_seq, Long rsvn_seq, String users_id, String name, String sysname) {
 		super();
 		this.rm_seq = rm_seq;
 		this.rsvn_seq = rsvn_seq;
 		this.users_id = users_id;
+		this.name = name;
+		this.sysname = sysname;
 	}
 	public Long getRm_seq() {
 		return rm_seq;
@@ -29,5 +34,17 @@ public class RoomRsvnMemberDTO {
 	}
 	public void setUsers_id(String users_id) {
 		this.users_id = users_id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSysname() {
+		return sysname;
+	}
+	public void setSysname(String sysname) {
+		this.sysname = sysname;
 	}
 }

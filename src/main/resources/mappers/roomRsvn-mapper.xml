@@ -23,6 +23,7 @@
 		from room_rsvn r
 		left outer join meeting_rooms m on r.room_seq = m.room_seq
 		where r.users_id = #{users_id}
+		order by start_dt desc
 	</select>
 	
 	<insert id="createReservation">
@@ -43,4 +44,62 @@
 		where r.room_seq = #{room_seq}
 		and TO_CHAR(r.start_dt, 'YYYY-MM-DD') = #{date}
 	</select>
+	
+	<resultMap id="RsvnDetailResultMap" type="com.study.app.domains.meetingRooms.RoomRsvnDTO" autoMapping="true">
+		<id property="rsvn_seq" column="rsvn_seq"/>
+		
+		<collection property="attendees" ofType="com.study.app.domains.meetingRooms.RoomRsvnMemberDTO">
+			<id property="rm_seq" column="rm_seq"/>
+			<result property="users_id" column="att_users_id"/>
+			<result property="name" column="att_name"/>
+			<result property="sysname" column="att_sysname"/>
+		</collection>
+	</resultMap>
+	
+	<select id="getMeetRsvnDetail" resultMap="RsvnDetailResultMap">
+		select 
+			r.*, mr.room_name, m.rm_seq, 
+			m.users_id as att_users_id, 
+			u.name as att_name,
+			u.sysname as att_sysname
+		from room_rsvn r
+		LEFT JOIN meeting_rooms mr ON r.room_seq = mr.room_seq
+		LEFT JOIN room_rsvn_member m ON r.rsvn_seq = m.rsvn_seq
+		LEFT JOIN users u ON m.users_id = u.id
+		where r.rsvn_seq = #{rsvn_seq}
+	</select>
+	
+	<select id="getOccupiedTimes" resultType="com.study.app.domains.meetingRooms.OccupiedTimeDTO">
+		select 
+			TO_CHAR(start_dt, 'HH24:MI') as startTime,
+			TO_CHAR(end_dt, 'HH24:MI') as endTime
+		from room_rsvn where room_seq = #{room_seq}
+			and TRUNC(start_dt) = TO_DATE(#{date}, 'YYYY-MM-DD')
+			and rsvn_seq != #{rsvn_seq}
+	</select>
+	
+	<update id="updateMeetRsvn">
+		update room_rsvn set 
+			room_seq = #{room_seq}, 
+			title = #{title},
+			start_dt = TO_TIMESTAMP(#{start_dt}, 'YYYY-MM-DD HH24:MI:SS'),
+			end_dt = TO_TIMESTAMP(#{end_dt}, 'YYYY-MM-DD HH24:MI:SS') 
+		where rsvn_seq = #{rsvn_seq}
+	</update>
+	
+	<delete id="removeRsvnMember">
+		delete from room_rsvn_member where rsvn_seq = #{rsvn_seq} and users_id = #{users_id}
+	</delete>
+	
+	<insert id="insertAddMember">
+		insert into room_rsvn_member values (rm_seq.nextval, #{rsvn_seq}, #{users_id})
+	</insert>
+	
+	<delete id="deleteMeetMember">
+		delete from room_rsvn_member where rsvn_seq = #{rsvn_seq}
+	</delete>
+	
+	<delete id="deleteMeetRsvn">
+		delete from room_rsvn where rsvn_seq = #{rsvn_seq}
+	</delete>
 </mapper>

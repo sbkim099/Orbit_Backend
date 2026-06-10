@@ -28,9 +28,7 @@ import com.study.app.domains.meetingRooms.MeetingRoomsService;
 import com.study.app.domains.rank.RankDTO;
 import com.study.app.domains.signup.SignupDTO;
 import com.study.app.domains.signup.SignupRequestDTO;
-import com.study.app.domains.signup.SignupService;
 import com.study.app.domains.users.UsersDTO;
-import com.study.app.domains.users.UsersService;
 
 @RestController
 @RequestMapping("/admin")
@@ -43,31 +41,25 @@ public class AdminController {
 	@Autowired
 	private AdminService adminServ;
 	@Autowired
-	private SignupService signupServ;
-	@Autowired
-	private UsersService userServ;
-	@Autowired
 	private DocumentsService docServ;
-	@Autowired
-	private MeetingRoomsService roomServ;
 
 	@GetMapping("/hr/allRequest")
 	public ResponseEntity<Map<String, Object>> getAllRequest(@RequestParam Long cPage,
 			@RequestParam String status,
 			@RequestParam(required = false) String searchTerm) {
-		Map<String, Object> result = signupServ.getAllRequest(cPage, status, searchTerm);
+		Map<String, Object> result = adminServ.getAllRequest(cPage, status, searchTerm);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/hr/{signup_seq}")
 	public ResponseEntity<SignupDTO> getUserInfo(@PathVariable Long signup_seq){
-		SignupDTO dto = signupServ.getUserInfo(signup_seq);
+		SignupDTO dto = adminServ.getUserInfo(signup_seq);
 		return ResponseEntity.ok(dto);
 	}
 
 	@GetMapping("/hr/getHrInfo")
 	public ResponseEntity<UsersDTO> getHrInfo(@RequestParam String id){
-		UsersDTO dto = userServ.getHrInfo(id);
+		UsersDTO dto = adminServ.getHrInfo(id);
 		return ResponseEntity.ok(dto);
 	}
 
@@ -91,7 +83,7 @@ public class AdminController {
 
 	@PutMapping("/hr/rejectSignup")
 	public ResponseEntity<Void> rejectSignup(@RequestParam Long signup_seq){
-		signupServ.rejectSignup(signup_seq);
+		adminServ.rejectSignup(signup_seq);
 		return ResponseEntity.ok().build();
 	}
 
@@ -194,7 +186,7 @@ public class AdminController {
 	
 	@GetMapping("ga/getAllRooms")
 	public ResponseEntity<List<MeetingRoomsDTO>> getAllRooms() {
-		List<MeetingRoomsDTO> result = roomServ.getAllRooms();
+		List<MeetingRoomsDTO> result = adminServ.getAllRooms();
 		return ResponseEntity.ok(result);
 	}
 	
@@ -202,7 +194,7 @@ public class AdminController {
 	public ResponseEntity<Void> addMeetingRoom(@RequestPart("input") MeetingRoomsDTO dto,
 												@RequestPart("file") MultipartFile file){
 		
-		roomServ.addMeetingRoom(dto, file);
+		adminServ.addMeetingRoom(dto, file);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -210,193 +202,15 @@ public class AdminController {
 	public ResponseEntity<Void> editMeetingRoom(@RequestPart("input") MeetingRoomsDTO dto,
 												@RequestPart(value = "file", required = false) MultipartFile file){
 		
-		roomServ.editMeetingRoom(dto, file);
+		adminServ.editMeetingRoom(dto, file);
 		return ResponseEntity.ok().build();
 	}
 	
 	@DeleteMapping("ga/deleteMeetingRoom/{room_seq}")
 	public ResponseEntity<Void> deleteMeetingRoom(@PathVariable Long room_seq){
-		roomServ.deleteMeetingRoom(room_seq);
+		adminServ.deleteMeetingRoom(room_seq);
 		return ResponseEntity.ok().build();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	@GetMapping("/aiQuestions")
 	public ResponseEntity<List<AiUnansweredQuestionsDTO>> getAiQuestions() {

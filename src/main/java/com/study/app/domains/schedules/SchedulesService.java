@@ -40,4 +40,28 @@ public class SchedulesService {
 		
 		schedDAO.addMeetingSchedules(dto);
 	}
+	
+	public void deleteSchedule(Long rsvn_seq, String users_id) {
+		schedDAO.deleteMeetingSchedule(rsvn_seq, users_id);
+	}
+	
+	public void insertMeetAddMember(RoomRsvnDTO rsvn, String users_id) {
+		SchedulesDTO dto = new SchedulesDTO();
+		dto.setTitle(rsvn.getTitle());
+		dto.setUsers_id(users_id);
+		dto.setStart_dt(rsvn.getStart_dt());
+		dto.setEnd_dt(rsvn.getEnd_dt());
+		dto.setSked_reason(rsvn.getTitle());
+		dto.setRef_seq(rsvn.getRsvn_seq());
+		
+		schedDAO.insertMeetAddMember(dto);
+	}
+	
+	public void updateMeetSchedule(RoomRsvnDTO dto) {
+		schedDAO.updateMeetSchedule(dto);
+	}
+	
+	public void cancelMeetRsvn(Long rsvn_seq) {
+		schedDAO.cancelMeetRsvn(rsvn_seq);
+	}
 }

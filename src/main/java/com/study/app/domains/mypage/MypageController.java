@@ -7,12 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
 import com.study.app.domains.annualLeave.AnnualLeaveDTO;
+import com.study.app.domains.meetingRooms.MeetingRoomsDTO;
+import com.study.app.domains.meetingRooms.OccupiedTimeDTO;
 import com.study.app.domains.meetingRooms.RoomRsvnDTO;
 
 @RestController
@@ -43,5 +48,38 @@ public class MypageController {
 	public ResponseEntity<List<RoomRsvnDTO>> getAllMyMeetRsvn(@RequestAttribute String loginId){
 		List<RoomRsvnDTO> list = mypageServ.getAllMyMeetRsvn(loginId);
 		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("getMeetRsvnDetail/{rsvn_seq}")
+	public ResponseEntity<List<RoomRsvnDTO>> getMeetRsvnDetail(@PathVariable Long rsvn_seq) {
+		List<RoomRsvnDTO> list = mypageServ.getMeetRsvnDetail(rsvn_seq);
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("getAllRooms")
+	public ResponseEntity<List<MeetingRoomsDTO>> getAllRooms() {
+		List<MeetingRoomsDTO> list = mypageServ.getAllRooms();
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("getOccupiedTimes")
+	public ResponseEntity<List<OccupiedTimeDTO>> getOccupiedTimes(@RequestParam Long room_seq,
+														 @RequestParam String date,
+														 @RequestParam Long rsvn_seq) {
+		
+		List<OccupiedTimeDTO> resp = mypageServ.getOccupiedTimes(room_seq, date, rsvn_seq);
+		return ResponseEntity.ok(resp);
+	}
+	
+	@PutMapping("updateMeetRsvn")
+	public ResponseEntity<Void> updateMeetRsvn(@RequestBody RoomRsvnDTO dto) {
+		mypageServ.updateMeetRsvn(dto);
+		return ResponseEntity.ok().build();
+	}
+	
+	@DeleteMapping("cancelMeetRsvn/{rsvn_seq}")
+	public ResponseEntity<Void> cancelMeetRsvn(@PathVariable Long rsvn_seq) {
+		mypageServ.cancelMeetRsvn(rsvn_seq);
+		return ResponseEntity.ok().build();
 	}
 }
