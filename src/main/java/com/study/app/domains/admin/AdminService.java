@@ -6,26 +6,35 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
-import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.departments.DepartmentsCountDTO;
 import com.study.app.domains.departments.DepartmentsDAO;
 import com.study.app.domains.departments.DepartmentsDTO;
 import com.study.app.domains.departments.DeptLeaveDTO;
 import com.study.app.domains.documents.DocumentsDAO;
 import com.study.app.domains.documents.DocumentsDTO;
+import com.study.app.domains.meetingRooms.MeetingRoomsDTO;
+import com.study.app.domains.meetingRooms.MeetingRoomsService;
 import com.study.app.domains.rank.RankDAO;
 import com.study.app.domains.rank.RankDTO;
-import com.study.app.domains.signup.SignupDAO;
 import com.study.app.domains.signup.SignupDTO;
 import com.study.app.domains.signup.SignupRequestDTO;
+import com.study.app.domains.signup.SignupService;
 import com.study.app.domains.users.UsersDAO;
 import com.study.app.domains.users.UsersDTO;
+import com.study.app.domains.users.UsersService;
 
 @Service
 public class AdminService {
-
+	
+	@Autowired
+	private SignupService signupServ;
+	@Autowired
+	private UsersService usersServ;
+	@Autowired
+	private MeetingRoomsService roomServ;
 	@Autowired
 	private DepartmentsDAO departmentsDao;
 	@Autowired
@@ -33,14 +42,22 @@ public class AdminService {
 	@Autowired
 	private UsersDAO usersDao;
 	@Autowired
-	private SignupDAO signupDao;
-	@Autowired
 	private AdminDAO adminDao;
 	@Autowired
-	private AnnualLeaveDAO alDao;
-	@Autowired
 	private DocumentsDAO docDao;
-
+	
+	public Map<String, Object> getAllRequest(Long cPage, String status, String searchTerm) {
+		return signupServ.getAllRequest(cPage, status, searchTerm);
+	}
+	
+	public SignupDTO getUserInfo(Long signup_seq) {
+		return signupServ.getUserInfo(signup_seq);
+	}
+	
+	public UsersDTO getHrInfo(String id) {
+		return usersServ.getHrInfo(id);
+	}
+	
 	public List<DepartmentsDTO> getDeptList() {
 		return departmentsDao.getDeptList();
 	}
@@ -50,32 +67,7 @@ public class AdminService {
 	}
 
 	public void userSignup(SignupRequestDTO request) {
-		SignupDTO signupInfo = signupDao.getUserInfo(request.getSignup_seq());
-
-		UsersDTO dto = new UsersDTO();
-
-		dto.setId(signupInfo.getId());
-		dto.setPw(signupInfo.getPw());
-		dto.setName(signupInfo.getName());
-		dto.setPhone(signupInfo.getPhone());
-		dto.setEmail(signupInfo.getEmail());
-		dto.setOriname(signupInfo.getOriname());
-		dto.setSsn_hash(signupInfo.getSsn_hash());
-		dto.setSsn_enc(signupInfo.getSsn_enc());
-		dto.setSsn_masked(signupInfo.getSsn_masked());
-		dto.setZonecode(signupInfo.getZonecode());
-		dto.setAddress1(signupInfo.getAddress1());
-		dto.setAddress2(signupInfo.getAddress2());
-		dto.setSysname(signupInfo.getSysname());
-
-		dto.setHire_date(request.getHire_date());
-		dto.setDept_seq(request.getDept_seq());
-		dto.setRank_seq(request.getRank_seq());
-
-		usersDao.insertUser(dto);
-		alDao.insertAnnualLeave(signupInfo.getId());
-
-		signupDao.updateStatusToApproved(request.getSignup_seq());
+		signupServ.userSignup(request);
 	}
 
 	public Map<String, Object> getAllUsers(String keyword, String status, Long start, Long end) {
@@ -101,7 +93,10 @@ public class AdminService {
 		return result;
 	}
 
-
+	public void rejectSignup(Long signup_seq) {
+		signupServ.rejectSignup(signup_seq);
+	}
+	
 	public int updateUsersState(UsersDTO dto) {
 		return usersDao.updateUsersState(dto);
 	}
@@ -159,197 +154,21 @@ public class AdminService {
 		return docDao.getAllDocs();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public List<MeetingRoomsDTO> getAllRooms() {
+		return roomServ.getAllRooms();
+	}
+	
+	public void addMeetingRoom(MeetingRoomsDTO dto, MultipartFile file) {
+		roomServ.addMeetingRoom(dto, file);
+	}
+	
+	public void editMeetingRoom(MeetingRoomsDTO dto, MultipartFile file) {
+		roomServ.editMeetingRoom(dto, file);
+	}
+	
+	public void deleteMeetingRoom(Long room_seq) {
+		roomServ.deleteMeetingRoom(room_seq);
+	}
 	
 	public List<AiUnansweredQuestionsDTO> getAiQuestions() {
 		return adminDao.getAiQuestions();

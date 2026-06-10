@@ -94,4 +94,39 @@ public class MeetingRoomsService {
 	public List<RoomRsvnDTO> getReservations(String date, Long room_seq) {
 		return rsvnDao.getReservations(date, room_seq);
 	}
+	
+	public List<RoomRsvnDTO> getMeetRsvnDetail(Long rsvn_seq) {
+		return rsvnDao.getMeetRsvnDetail(rsvn_seq);
+	}
+	
+	public List<OccupiedTimeDTO> getOccupiedTimes(Long room_seq, String date, Long rsvn_seq) {
+		return rsvnDao.getOccupiedTimes(room_seq, date, rsvn_seq);
+	}
+	
+	@Transactional
+	public void updateMeetRsvn(RoomRsvnDTO dto) {
+		rsvnDao.updateMeetRsvn(dto);
+		
+		if (dto.getRemovedAttendees() != null && !dto.getRemovedAttendees().isEmpty()) {
+			for (RoomRsvnMemberDTO member : dto.getRemovedAttendees()) {
+				scheServ.deleteSchedule(dto.getRsvn_seq(), member.getUsers_id());
+				rsvnDao.removeRsvnMember(dto.getRsvn_seq(), member.getUsers_id());
+			}
+		}
+		
+		if (dto.getAddedAttendees() != null && !dto.getAddedAttendees().isEmpty()) {
+			for (RoomRsvnMemberDTO member : dto.getAddedAttendees()) {
+				rsvnDao.insertAddMember(dto.getRsvn_seq(), member.getUsers_id());
+				scheServ.insertMeetAddMember(dto, member.getUsers_id());
+			}
+		}
+		scheServ.updateMeetSchedule(dto);
+	}
+	
+	@Transactional
+	public void cancelMeetRsvn(Long rsvn_seq) {
+		scheServ.cancelMeetRsvn(rsvn_seq);
+		rsvnDao.deleteMeetMember(rsvn_seq);
+		rsvnDao.deleteMeetRsvn(rsvn_seq);
+	}
 }

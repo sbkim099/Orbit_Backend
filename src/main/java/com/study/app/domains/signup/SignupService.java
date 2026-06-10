@@ -13,13 +13,20 @@ import com.study.app.commons.Aes256Util;
 import com.study.app.commons.EncryptionUtils;
 import com.study.app.commons.MaskingUtil;
 import com.study.app.commons.Sha256Util;
+import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.file.FileService;
+import com.study.app.domains.users.UsersDAO;
+import com.study.app.domains.users.UsersDTO;
 
 @Service
 public class SignupService {
 	
 	@Autowired
 	private SignupDAO dao;
+	@Autowired
+	private UsersDAO usersDao;
+	@Autowired
+	private AnnualLeaveDAO alDao;
 	@Autowired
 	private FileService fileServ;
 	@Autowired
@@ -103,6 +110,35 @@ public class SignupService {
 	
 	public SignupDTO getUserInfo(Long signup_seq) {
 		return dao.getUserInfo(signup_seq);
+	}
+	
+	public void userSignup(SignupRequestDTO request) {
+		SignupDTO signupInfo = dao.getUserInfo(request.getSignup_seq());
+
+		UsersDTO dto = new UsersDTO();
+
+		dto.setId(signupInfo.getId());
+		dto.setPw(signupInfo.getPw());
+		dto.setName(signupInfo.getName());
+		dto.setPhone(signupInfo.getPhone());
+		dto.setEmail(signupInfo.getEmail());
+		dto.setOriname(signupInfo.getOriname());
+		dto.setSsn_hash(signupInfo.getSsn_hash());
+		dto.setSsn_enc(signupInfo.getSsn_enc());
+		dto.setSsn_masked(signupInfo.getSsn_masked());
+		dto.setZonecode(signupInfo.getZonecode());
+		dto.setAddress1(signupInfo.getAddress1());
+		dto.setAddress2(signupInfo.getAddress2());
+		dto.setSysname(signupInfo.getSysname());
+
+		dto.setHire_date(request.getHire_date());
+		dto.setDept_seq(request.getDept_seq());
+		dto.setRank_seq(request.getRank_seq());
+
+		usersDao.insertUser(dto);
+		alDao.insertAnnualLeave(signupInfo.getId());
+
+		dao.updateStatusToApproved(request.getSignup_seq());
 	}
 	
 	public void rejectSignup(Long signup_seq) {
