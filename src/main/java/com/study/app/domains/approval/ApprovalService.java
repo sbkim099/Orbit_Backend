@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.google.cloud.storage.Storage;
 import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.file.FileService;
+import com.study.app.domains.users.UsersDTO;
+import com.study.app.domains.users.UsersService;
 
 @Service
 public class ApprovalService {
@@ -26,10 +25,12 @@ public class ApprovalService {
 	@Autowired
 	private FileService fileServ;
 	@Autowired
-	private Storage storage;
-	@Value("${spring.cloud.gcp.bucket}")
-	private String bucketName;
-
+	private UsersService usersServ;
+	
+	public List<UsersDTO> getAllEmployees() {
+		return usersServ.getAllEmployees();
+	}
+	
 	private void insertCommonApprovalData(DraftDocumentsDTO dto) {
 		if(dto.getIs_temp() == 1) {
 			LocalDate expireDate = LocalDate.now().plusDays(7);
@@ -37,14 +38,13 @@ public class ApprovalService {
 		}else {
 			dto.setTemp_expires_at(null);
 		}
-		// selectKey(BEFORE)에 의해 실행 후 docSeq 필드에 시퀀스 값이 채워짐
 		dao.insertDraftDocument(dto); 
-		Long docSeq = dto.getDoc_seq(); // 채워진 시퀀스 꺼내기
+		Long docSeq = dto.getDoc_seq();
 
 		// 결재라인 정보 저장
 		if(dto.getApprovers() != null) {
 			for (ApprovalLinesDTO app : dto.getApprovers()) {
-				app.setDoc_seq(docSeq); // 외래키 주입
+				app.setDoc_seq(docSeq);
 				if (app.getStep_order() == 1) {
 					app.setStatus("IN_PROGRESS"); 
 				} else {
@@ -570,7 +570,6 @@ public class ApprovalService {
 	@Transactional
 	public void deleteDoc(Long doc_seq , String doc_type) {
 		switch(doc_type) {
-		// 기안 문서 종류 (VACATION(연차) / PAYMENT(지출) / GENERAL(일반) / PURCHASE(구매))
 			case "VACATION" :
 				deleteVacationDoc(doc_seq);
 				break;
