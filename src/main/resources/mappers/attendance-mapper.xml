@@ -69,4 +69,10 @@
 	    ]]>
 </select>
 
+<update id="changeCheckout">
+	update attendance set 
+		check_out = #{req_check_out}, 
+		total_work_min = ROUND((CAST(#{req_check_out} AS DATE - CAST(check_in AS DATE)) * 24 * 60)
+	where attendance_seq = #{attendance_seq}
+</update>
 </mapper>

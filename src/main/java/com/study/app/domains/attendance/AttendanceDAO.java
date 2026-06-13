@@ -4,6 +4,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.study.app.domains.checkoutRequest.CheckoutRequestDTO;
+
 @Repository
 public class AttendanceDAO {
 	
@@ -30,5 +32,7 @@ public class AttendanceDAO {
 		return mybatis.selectOne("Attendance.getCntWeek",loginId);
 	}
 	
-
+	public void changeCheckout(CheckoutRequestDTO dto) {
+		mybatis.update("Attendance.changeCheckout", dto);
+	}
 }

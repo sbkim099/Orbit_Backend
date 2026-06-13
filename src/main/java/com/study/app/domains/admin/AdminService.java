@@ -512,4 +512,12 @@ public class AdminService {
 	public Map<String, Object> getAllOvertimeRQ(Long cPage, String status) {
 		return overtimeServ.getAllOvertimeRQ(cPage, status);
 	}
+	
+	public void approveCheckout(Long checkout_seq, String loginId) {
+		checkoutServ.approveCheckout(checkout_seq, loginId);
+	}
+	
+	public void rejectCheckout(Long checkout_seq, String loginId) {
+		checkoutServ.rejectCheckout(checkout_seq, loginId);
+	}
 }
