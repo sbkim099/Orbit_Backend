@@ -37,6 +37,10 @@ public class ProjectsDAO {
 		batis.update("Projects.updateProject", dto);
 	}
 	
+	public void completeProject(Long project_seq) {
+		batis.update("Projects.completeProject", project_seq);
+	}
+	
 	public void deleteProjectMembers(Long project_seq) {
 		batis.delete("Projects.deleteProjectMembers", project_seq);
 	}
