@@ -264,4 +264,39 @@
 	        END
 	    WHERE SUPPLY_SEQ = #{supply_seq}
 	</update>
+	
+	<!--내 신청 내역-->
+	<resultMap id="supplyRequestMap" type="com.study.app.domains.supplies.SupplyRequestDTO">
+    <id property="req_seq" column="req_seq"/>
+    <result property="req_date" column="req_date"/>
+    <result property="status" column="status"/>
+    <result property="reason" column="reason"/>
+    <collection property="items" ofType="com.study.app.domains.supplies.SupplyRequestItemsDTO">
+        <result property="item_seq" column="item_seq"/>
+        <result property="supply_name" column="supply_name"/>
+        <result property="ea" column="ea"/>
+        <result property="use_type" column="use_type"/>
+    </collection>
+</resultMap>
+
+	<select id="mySupplyRequest" resultMap="supplyRequestMap">
+	    SELECT
+	        SR.REQ_SEQ, SR.REQ_DATE, SR.STATUS, SR.REASON,
+	        SRI.ITEM_SEQ, SRI.EA, SRI.USE_TYPE,
+	        S.SUPPLY_NAME
+	    FROM SUPPLY_REQUEST SR
+	    LEFT JOIN SUPPLY_REQUEST_ITEMS SRI ON SR.REQ_SEQ = SRI.REQ_SEQ
+	    LEFT JOIN SUPPLIES S ON SRI.SUPPLY_SEQ = S.SUPPLY_SEQ
+	    WHERE SR.USERS_ID = #{loginId}
+	    ORDER BY SR.REQ_DATE DESC
+	</select>
+	<delete id="deleteMySupplyReqItems">
+	    DELETE FROM SUPPLY_REQUEST_ITEMS
+	    WHERE REQ_SEQ = #{req_seq}
+	</delete>
+	<delete id="deleteMySupplyRequest">
+	    DELETE FROM SUPPLY_REQUEST
+	    WHERE REQ_SEQ = #{req_seq}
+	    AND STATUS IN ('PENDING', 'REJECTED')
+	</delete>
 </mapper>

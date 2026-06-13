@@ -67,4 +67,11 @@ public class SupplyService {
 	        supplyDAO.supplyRequestItems(item);
 	    }
 	}
+	
+	/*mypage myRequestList*/
+	@Transactional
+	public void deleteMySupplyRequest(Long req_seq) {
+	    supplyDAO.deleteMySupplyReqItems(req_seq); // 자식 먼저
+	    supplyDAO.deleteMySupplyRequest(req_seq);       // 부모 나중에
+	}
 }
