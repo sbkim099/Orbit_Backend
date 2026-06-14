@@ -685,6 +685,9 @@ public class ApprovalService {
 		List<String> file = dao.findPaymentFile(paySeq);
 		
 		for(String sysname : file) {
+			if(sysname == null || sysname.isBlank()) {
+		        continue;
+		    }
 			fileServ.deleteFromGCS(sysname);
 		}
 		dao.deletePayItem(doc_seq);
@@ -699,6 +702,9 @@ public class ApprovalService {
 		List<String> file = dao.findPurAttach(purchaseSeq);
 		
 		for(String sysname : file) {
+			if(sysname == null || sysname.isBlank()) {
+		        continue;
+		    }
 			fileServ.deleteFromGCS(sysname);
 		}
 		dao.deletePurAttach(doc_seq);
