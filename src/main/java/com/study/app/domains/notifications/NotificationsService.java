@@ -26,9 +26,7 @@ public class NotificationsService {
 	
 	public void insertNoti(NotificationsDTO dto) {
 		notiDao.insertNoti(dto);
-		
 		stomp.convertAndSend("/sub/notification/" + dto.getUsers_id(), dto);
-		System.out.println("/sub/notification/" + " " + dto.getUsers_id() + " " + dto);
 	}
 	
 	public void deleteNotiByRsvnList(List<Long> rsvnList) {
@@ -61,5 +59,9 @@ public class NotificationsService {
 	
 	public String getNotiDocType(Long ref_seq) {
 		return appDao.getNotiDocType(ref_seq);
+	}
+	
+	public void updateReadNoti(Long noti_seq) {
+		notiDao.updateReadNoti(noti_seq);
 	}
 }
