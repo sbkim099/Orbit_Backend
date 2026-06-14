@@ -38,6 +38,25 @@
 		where Schedule_seq=#{schedule_seq}
 	</update>
 	
+	<select id="getApprovedVacations" resultType="com.study.app.domains.schedules.SchedulesDTO">
+	    SELECT 
+	        v.vac_seq as schedule_seq,
+	        d.title,
+	        'ANNUAL' as schedule_type,
+	        d.users_id,
+	        CAST(v.start_date AS TIMESTAMP) as start_dt,
+	        CAST(v.end_date AS TIMESTAMP) as end_dt,
+	        v.reason as sked_reason,
+	        0 as is_public,
+	        null as ref_seq,
+	        null as ref_type,
+	        d.created_at
+	    FROM vacation v
+	    JOIN draft_documents d ON v.doc_seq = d.doc_seq
+	    WHERE d.status = 'APPROVED'
+	    AND d.users_id = #{users_id}
+	</select>
+	
 	<delete id="deleteRoomRsvn">
 		delete from schedules
 		where ref_type = 'MEETING' and ref_seq in

@@ -44,6 +44,10 @@ public class SchedulesService {
 		return schedDAO.updateSchedules(dto);
 	}
 	
+	public List<SchedulesDTO> getApprovedVacations(String usersId) {
+	    return schedDAO.getApprovedVacations(usersId);
+	}
+	
 	public void deleteRoomRsvn(List<Long> rsvnList) {
 		schedDAO.deleteRoomRsvn(rsvnList);
 	}

@@ -59,4 +59,11 @@ public class SchedulesController {
 		schedServ.updateSchedules(dto);
 		return ResponseEntity.ok().build();
 	}
+	
+	@GetMapping("/vacations")
+	public ResponseEntity<List<SchedulesDTO>> getApprovedVacations(
+	        @RequestHeader("Authorization") String token) {
+	    String usersId = jwtUtil.getSubject(token.replace("Bearer ", ""));
+	    return ResponseEntity.ok(schedServ.getApprovedVacations(usersId));
+	}
 }
