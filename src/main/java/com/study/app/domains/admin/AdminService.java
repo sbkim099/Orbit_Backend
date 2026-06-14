@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
@@ -44,6 +45,10 @@ public class AdminService {
 	private MeetingRoomsService roomServ;
 	@Autowired
 	private SupplyService supplyServ;
+	@Autowired
+	private CheckoutRequestService checkoutServ;
+	@Autowired
+	private OvertimeRequestService overtimeServ;
 	
 	@Autowired
 	private DepartmentsDAO departmentsDao;
@@ -57,7 +62,6 @@ public class AdminService {
 	private DocumentsDAO docDao;
 	@Autowired
 	private SupplyDAO supplyDAO;
-	
 	
 	public Map<String, Object> getAllRequest(Long cPage, String status, String searchTerm) {
 		return signupServ.getAllRequest(cPage, status, searchTerm);
@@ -228,292 +232,6 @@ public class AdminService {
 	public void returnSupply(SupplyRentalDTO dto) {
 	    supplyServ.returnSupply(dto);  // @Transactional은 SupplyService에 있으니까 OK
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	@Autowired
-	private CheckoutRequestService checkoutServ;
-	@Autowired
-	private OvertimeRequestService overtimeServ;
-	
 	
 	public Map<String, Object> getAllCheckoutRQ(Long cPage, String status) {
 		return checkoutServ.getAllCheckoutRQ(cPage, status);
@@ -538,4 +256,23 @@ public class AdminService {
 	public void rejectOvertime(Long overtime_seq, String loginId) {
 		overtimeServ.rejectOvertime(overtime_seq, loginId);
 	}
+	
+	public AiQuestionCountDTO adminAiQuestionsData(Long dept_seq, String auth_group) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("dept_seq", dept_seq);
+		params.put("auth_group", auth_group);
+		
+		return adminDao.adminAiQuestionsData(params);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
