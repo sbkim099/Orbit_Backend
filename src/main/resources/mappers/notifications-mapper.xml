@@ -32,7 +32,7 @@
 	</delete>
 	
 	<select id="getMyNotiListByLoginId" resultType="com.study.app.domains.notifications.NotificationsDTO">
-		select * from notifications where users_id = #{loginId} order by noti_seq desc
+		select * from notifications where users_id = #{loginId} and read_yn = 'N' order by noti_seq desc
 	</select>
 	
 	<update id="updateReadNoti">
