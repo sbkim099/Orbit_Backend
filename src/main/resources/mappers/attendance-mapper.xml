@@ -21,6 +21,13 @@
     WHERE USERS_ID = #{users_id}
     AND WORK_DATE = TRUNC(SYSDATE)
 </select>
+<!--모든 날짜 용-->
+<select id="getMyAttendanceList" resultType="com.study.app.domains.attendance.AttendanceDTO">
+    SELECT ATTENDANCE_SEQ, WORK_DATE, CHECK_IN, CHECK_OUT
+    FROM ATTENDANCE
+    WHERE USERS_ID = #{users_id}
+    ORDER BY WORK_DATE DESC
+</select>
 <select id="getCntMonth" resultType="com.study.app.domains.attendance.AttendanceDTO">
 	SELECT 
 	  COUNT(*) AS work_days,
