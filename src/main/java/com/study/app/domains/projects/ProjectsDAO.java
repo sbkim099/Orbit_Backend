@@ -52,4 +52,8 @@ public class ProjectsDAO {
 	public List<String> selectProjectMemberIds(Long project_seq) {
 		return batis.selectList("Projects.selectProjectMemberIds", project_seq);
 	}
+	
+	public ProjectCountDTO getProjectCount(Map<String, String> params) {
+		return batis.selectOne("Projects.getProjectCount", params);
+	}
 }

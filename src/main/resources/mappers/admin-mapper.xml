@@ -132,4 +132,16 @@
 		where question_seq = #{question_seq}
 	</update>
 	
+	<select id="adminAiQuestionsData" resultType="com.study.app.domains.admin.AiQuestionCountDTO">
+		select count(*) as allCount,
+			sum(case when status = 'PENDING' then 1 else 0 end) as pendingCount,
+			sum(case when status = 'ANSWERED' then 1 else 0 end) as answeredCount
+		from ai_unanswered_questions
+		
+			<where>
+				<if test="auth_group != 'ROLE_SUPER_ADMIN'">
+					dept_seq = #{dept_seq}
+				</if>
+			</where>
+	</select>
 </mapper>
