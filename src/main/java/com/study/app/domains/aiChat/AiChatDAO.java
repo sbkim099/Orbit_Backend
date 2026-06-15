@@ -61,7 +61,15 @@ public class AiChatDAO {
 		return batis.selectOne("AiChat.lastUserQuestion", chat_seq);
 	}
 	
-//	public List<AiMessagesDTO> recentMessages(Long chat_seq) {
-//		return batis.selectList("AiChat.recentMessages", chat_seq);
-//	}
+	public Long getMyQnaAllCount(String loginId) {
+		return batis.selectOne("AiChat.getMyQnaAllCount", loginId);
+	}
+	
+	public Long getMyQnaPendingCount(String loginId) {
+		return batis.selectOne("AiChat.getMyQnaPendingCount", loginId);
+	}
+	
+	public Long getMyQnaAnsweredCount(String loginId) {
+		return batis.selectOne("AiChat.getMyQnaAnsweredCount", loginId);
+	}
 }

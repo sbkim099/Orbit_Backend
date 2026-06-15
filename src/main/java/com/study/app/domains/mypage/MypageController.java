@@ -1,6 +1,7 @@
 package com.study.app.domains.mypage;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,11 @@ public class MypageController {
 	public ResponseEntity<Void> deleteMyQuestions(@PathVariable Long question_seq) {
 		mypageServ.deleteMyQuestions(question_seq);
 		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/getMyQnaCount")
+	public ResponseEntity<Map<String, Object>> getMyQnaCount(@RequestAttribute String loginId) {
+		return ResponseEntity.ok(mypageServ.getMyQnaCount(loginId));
 	}
 	
 	@GetMapping("getAllMyMeetRsvn")
