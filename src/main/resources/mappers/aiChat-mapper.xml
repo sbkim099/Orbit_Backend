@@ -71,8 +71,16 @@
 	    	where rownum = 1
 	</select>
 
-<!--	<select id="recentMessages" resultType="com.study.app.domains.aiChat.AiMessagesDTO">-->
-<!--		select role, content from ai_messages where chat_seq = #{chat_seq}-->
-<!--		order by msg_seq desc-->
-<!--	</select>-->
+	<select id="getMyQnaAllCount" resultType="Long">
+		select count(*) from ai_unanswered_questions where users_id = #{loginId} 
+	</select>
+	
+	<select id="getMyQnaPendingCount" resultType="Long">
+		select count(*) from ai_unanswered_questions where users_id = #{loginId} and status = 'PENDING'
+	</select>
+	
+	<select id="getMyQnaAnsweredCount" resultType="Long">
+		select count(*) from ai_unanswered_questions where users_id = #{loginId} and status = 'ANSWERED'
+	</select>
+	
 </mapper>

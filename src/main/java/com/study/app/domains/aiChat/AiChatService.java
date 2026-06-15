@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -82,16 +80,11 @@ public class AiChatService {
 		}
 
 		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, role, content, null, null, null, null));
-//		이전 대화 기억하는 로직 (구현 대기 중)
-//		AiMessagesDTO lastUserQuestion = aiDao.lastUserQuestion(chat_seq);
-//		String searchQuery = lastUserQuestion.getContent() + " " + content;
-//		System.out.println(searchQuery);
+		
 		Map<String, Object> aiResult = new HashMap<>();
 		aiResult.put("chat_seq", chat_seq);
 
 		Map<String, Object> requestBody = new HashMap<>();
-//		이전 대화 기억하는 로직 (구현 대기 중)
-//		requestBody.put("query", searchQuery);
 		requestBody.put("query", content);
 		requestBody.put("limit", 10);
 
@@ -103,7 +96,7 @@ public class AiChatService {
 				.body(new ParameterizedTypeReference<List<SearchResultDTO>>() {});
 
 		List<SearchResultDTO> filteredDocs = similarDocs.stream()
-				.limit(5)
+				.limit(10)
 				.collect(Collectors.toList());
 
 		if (filteredDocs.isEmpty()) {
@@ -246,14 +239,32 @@ public class AiChatService {
 					+ "2. **[구체성 유지]**: 주요 논의 내용이나 결정 사항을 작성할 때, 대화의 맥락을 알 수 있도록 구체적인 배경이나 이유를 포함하여 서술하세요. 단어만 나열하는 무성의한 요약은 금지합니다."
 					+ "3. **[담당자 및 기한 명시]**: 할 일을 작성할 때는 회의록에 언급된 **담당자 이름(또는 부서)**과 **완료 목표 기한(Due Date)**을 데이터에서 찾아 명확하게 매칭하여 기록하세요."
 					+ "4. **[엄격한 사실 근거]**: 데이터에 존재하지 않는 내용이나 회의 중 확정되지 않은 추측성 정보, 일반 상식을 답변에 절대 추가하지 마십시오. 오직 제공된 [회의록 데이터]의 내용으로만 답변해야 합니다."
-					+ "5. 사용자가 특정 날짜(예: '6월 10일 회의', '2026-06-10 회의') 또는 특정 회의명으로 회의를 조회한 경우에는 [회의록 데이터] 전체를 검토하여 동일한 회의에 속한 정보들을 종합해 답변하십시오."
+					
+					+ "5. 사용자가 특정 날짜만 언급한 경우(예: '6월 9일 회의록', '2026-06-09 회의들', '6월 9일 진행한 회의 내용')에는 해당 날짜에 존재하는 모든 회의를 대상으로 답변해야 합니다."
+					+ "동일 날짜에 여러 회의가 존재하는 경우에는 각 회의를 구분하여 모두 포함하십시오."
+					+ "특정 날짜 조회 시 하나의 회의만 선택하여 답변하지 마십시오."
+					+ "날짜에 해당하는 모든 회의를 수집한 후 회의별로 주요 내용, 결정 사항, 할 일을 정리하십시오."
+					+ "사용자가 '회의들', '회의록들', '전체', '목록', '모든 회의' 등의 표현을 사용한 경우에는 단일 회의 요약이 아닌 다중 회의 요약 요청으로 간주하십시오."
+					+ "[다중 회의 요약 형식]"
+					+ "회의가 2건 이상인 경우 아래 형식을 사용하십시오."
+					+ "===== 회의 1 ====="
+					+ "회의명 : ..."
+					+ "주요 내용 : ..."
+					+ "===== 회의 2 ====="
+					+ "회의명 : ..."
+					+ "주요 내용 : ..."
+					+ "===== 회의 N ====="
 					+ " 회의 개요, 주요 내용, 결정 사항, 할 일 정보가 서로 다른 청크에 나누어 존재할 수 있으므로 단일 청크에 해당 항목이 없더라도 같은 회의의 다른 데이터에서 관련 내용을 찾아 요약해야 합니다."
 					+ " 사용자가 '주요 내용', '결정 사항', '할 일' 중 특정 항목만 요청한 경우에도 해당 회의 전체 맥락을 먼저 파악한 뒤 요청한 항목만 추출하여 답변하십시오."
 					+ " 날짜만 언급된 경우에는 해당 날짜의 회의명과 회의 개요를 먼저 식별한 후 관련 청크를 근거로 답변하십시오."
 					+ " 단, 실제 데이터에 존재하지 않는 내용은 생성하지 마십시오."
-//					+ "6. **[예외 처리]**: 제공된 [회의록 데이터]가 유저가 요청한 질문이나 특정 회의 내용과 전혀 관련이 없거나, 핵심 정보가 부족한 경우 추측하여 답변하지 마십시오."
-//					+ " 이 경우에는 반드시 유저의 질문을 포함해 '사내 데이터베이스에서 (유저질문) 와(과) 관련된 회의록 규정이나 내용을 찾지 못했습니다. 😢'라고 답하십시오."
-					+ " 6. **[예외 처리]**: 동일한 회의에 대한 다른 데이터에도 해당 정보가 존재하지 않는 경우에만 '사내 데이터베이스에서 (유저질문) 와(과) 관련된 회의록 내용을 찾지 못했습니다. 😢'라고 답하십시오."
+					
+//					+ "5. 사용자가 특정 날짜(예: '6월 10일 회의', '2026-06-10 회의') 또는 특정 회의명으로 회의를 조회한 경우에는 [회의록 데이터] 전체를 검토하여 동일한 회의에 속한 정보들을 종합해 답변하십시오."
+//					+ " 회의 개요, 주요 내용, 결정 사항, 할 일 정보가 서로 다른 청크에 나누어 존재할 수 있으므로 단일 청크에 해당 항목이 없더라도 같은 회의의 다른 데이터에서 관련 내용을 찾아 요약해야 합니다."
+//					+ " 사용자가 '주요 내용', '결정 사항', '할 일' 중 특정 항목만 요청한 경우에도 해당 회의 전체 맥락을 먼저 파악한 뒤 요청한 항목만 추출하여 답변하십시오."
+//					+ " 날짜만 언급된 경우에는 해당 날짜의 회의명과 회의 개요를 먼저 식별한 후 관련 청크를 근거로 답변하십시오."
+//					+ " 단, 실제 데이터에 존재하지 않는 내용은 생성하지 마십시오."
+					+ " 6. **[예외 처리]**: 동일한 회의에 대한 다른 데이터에도 해당 정보가 존재하지 않는 경우에만 '사내 데이터베이스에서 (유저질문) 와(과) 관련된 회의록 내용을 찾지 못했습니다. 😢\n정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.'라고 답하십시오."
 					+ " 특정 청크에 정보가 없다는 이유만으로 즉시 찾지 못했다고 답변해서는 안 됩니다."
 					+ "7. 임직원을 대하는 격식있고 명확한 비즈니스 어조(한글 존댓말)를 유지하세요. 답변의 마지막에는 항상 '추가로 궁금하신 사항이 있으시면 언제든 말씀해 주시길 바랍니다.'라는 정중한 맺음말을 붙이십시오."
 					+ "8. **[출력 포맷팅]**: 임직원이 보기 편하도록 항목별 줄바꿈을 적극 활용하고, 소분류나 상세 내용에는 -(하이픈)을 활용하여 가독성 높게 출력하세요."
@@ -282,7 +293,7 @@ public class AiChatService {
 					+ "4. 제공된 데이터 중 유저의 핵심 질문(\"출근 전 준비사항\")과 맥락이 맞지 않는 노이즈 데이터(예: 출퇴근 방법 등)가 섞여 있다면, 무리하게 답변에 포함하지 말고 과감히 제외하십시오."
 					+ "5. 데이터 내에 존재하는 구체적인 단어나 기준(예:신분증, 복장 종류, 제출 기한 등)을 생략하거나 숨기지 말고 임직원에게 명확하게 매뉴얼 형태로 풀어서 안내하세요."
 					+ "6. 사용자의 질문에 답하기 위한 핵심 정보가 [사내 문서 데이터]에 존재하지 않으면 절대 추측하거나 일반 상식을 사용하지 마십시오."
-					+ " 사용자의 질문과 직접적으로 일치하는 규정, 절차, 정책, 회의 내용이 데이터에 없는 경우에는 반드시 사용자의 질문을 함께 포함해 '사내 데이터베이스에서 (사용자질문) 와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢'라고 답하십시오."
+					+ " 사용자의 질문과 직접적으로 일치하는 규정, 절차, 정책, 회의 내용이 데이터에 없는 경우에는 반드시 사용자의 질문을 함께 포함해 '사내 데이터베이스에서 (사용자질문) 와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.'라고 답하십시오."
 					+ " 예를 들어 일반 상식 질문(예: 사과는 무슨 색인가, 대한민국 수도는 어디인가, 오늘 날씨는 어떤가 , 공룡 이름 등)은 사내 문서 데이터와 관련이 없으므로 답변하지 마십시오."
 					+ " 검색 결과에 단순히 유사한 단어가 포함되어 있더라도 질문에 대한 근거가 되지 않으면 해당 내용을 사용하지 마십시오."
 					+ "7. 임직원을 대하는 격식있고 명확한 비즈니스 어조(한글 존댓말 씁니다.)를 유지하세요."
@@ -294,36 +305,12 @@ public class AiChatService {
 					+ " 예를 들어 기술 스택 문서가 검색되었는데 사용자가 복리후생을 질문한 경우, 해당 문서를 근거로 답변해서는 안 됩니다."
 					+ " 회의록이 검색되었더라도 질문과 관련 없는 회의 내용이면 무시하십시오."
 					+ "10. 답변을 생성하기 전에 먼저 [사내 문서 데이터]가 사용자의 질문에 실제로 답할 수 있는 근거를 포함하는지 판단하십시오."
-					+ " 질문과 직접 관련된 규정, 절차, 정책, 기술 정보, 회의 내용이 존재하지 않으면 답변을 생성하지 말고 반드시 '사내 데이터베이스에서 (질문) 와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢'라고 답하십시오."
+					+ " 질문과 직접 관련된 규정, 절차, 정책, 기술 정보, 회의 내용이 존재하지 않으면 답변을 생성하지 말고 반드시 '사내 데이터베이스에서 (질문) 와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.'라고 답하십시오."
 					+ " 단순히 일부 단어가 유사하거나 같은 부서 문서가 검색되었다는 이유만으로 답변을 생성해서는 안 됩니다."
-//					이전 대화 기억하는 로직
-//					+ "11. 사용자가 직전 대화와 연결된 후속 질문을 한 경우에는 이미 설명한 내용을 반복하지 말고, 새롭게 질문한 내용만 중심으로 답변하십시오."
-//					+ " 예: '연차는?' 이후 '반차는?' 이라고 질문하면 연차 전체 규정을 다시 설명하지 말고 반차 규정만 설명하십시오."
 					+ ""
 					+ "[사내 문서 데이터]"
 					+ "%s".formatted(context);
 		}
-//		이전 대화 기억하는 로직
-//		List<AiMessagesDTO> history = aiDao.recentMessages(chat_seq);
-//
-//		List<Message> promptMessages = new ArrayList<>();
-//
-//		promptMessages.add(new SystemMessage(systemPrompt));
-//
-//		for(AiMessagesDTO msg : history){
-//		    if("USER".equals(msg.getRole())){
-//		        promptMessages.add(
-//		                new UserMessage(msg.getContent())
-//		        );
-//		    }else if("AI".equals(msg.getRole())){
-//		        promptMessages.add(
-//		                new AssistantMessage(msg.getContent())
-//		        );
-//		    }
-//		}
-//		promptMessages.add(new UserMessage(content));
-//
-//		Prompt prompt = new Prompt(promptMessages);
 
 		Prompt prompt = new Prompt(List.of(
 				new SystemMessage(systemPrompt),
@@ -335,16 +322,11 @@ public class AiChatService {
 		if(context.contains("회의명 :")) {
 		    aiResult.put("resultSources", Collections.emptyList());
 		}
-		else if(aiAnswer.contains("찾지 못했습니다") || aiAnswer.contains("관련된 규정이나 가이드를 찾지 못했습니다")) {
+		else if(aiAnswer.contains("찾지 못했습니다. 😢") || aiAnswer.contains("관리자에게")) {
 			aiResult.put("resultSources", Collections.emptyList());
 		}else {
 			aiResult.put("resultSources", resultSources);
 		}
-
-//		System.out.println("= = = = = = = = = = = = = =");
-//		System.out.println(dbRefChunkValue);
-//		System.out.println(dbRefRagDocValue);
-//		System.out.println("= = = = = = = = = = = = = =");
 
 		aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI", aiAnswer, dbRefChunkValue, null, null, dbRefRagDocValue));
 		aiResult.put("aiAnswer", aiAnswer);
@@ -523,6 +505,9 @@ public class AiChatService {
 			List<RagDocumentsDTO> sources =
 					ragDao.sourcesByRagDocSeqs(ragDocSeqs);
 
+			sources = sources.stream()
+					.filter(doc -> "DOCUMENTS".equals(doc.getSource_type()))
+					.toList();
 			msg.setResultSources(sources);
 		}
 

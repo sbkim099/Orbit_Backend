@@ -1,6 +1,8 @@
 package com.study.app.domains.mypage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,14 @@ public class MypageService {
 	
 	public void deleteMyQuestions(Long question_seq) {
 		aiChatDao.deleteMyQuestions(question_seq);
+	}
+	
+	public Map<String, Object> getMyQnaCount(String loginId) {
+		Map<String, Object> result = new HashMap<>();
+		result.put("allCount", aiChatDao.getMyQnaAllCount(loginId));
+		result.put("pendingCount", aiChatDao.getMyQnaPendingCount(loginId));
+		result.put("answeredCount", aiChatDao.getMyQnaAnsweredCount(loginId));
+		return result;
 	}
 	
 	public List<RoomRsvnDTO> getAllMyMeetRsvn(String loginId) {

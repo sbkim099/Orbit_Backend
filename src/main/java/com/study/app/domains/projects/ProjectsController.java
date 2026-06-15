@@ -96,4 +96,9 @@ public class ProjectsController {
 		return ResponseEntity.ok().build();
 	}
 	
+	@GetMapping("/getProjectCount/{role}")
+	public ResponseEntity<ProjectCountDTO> getProjectCount(@PathVariable String role, @RequestAttribute String loginId) {
+		return ResponseEntity.ok(projectServ.getProjectCount(role, loginId));
+	}
+	
 }

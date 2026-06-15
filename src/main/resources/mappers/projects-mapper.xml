@@ -72,4 +72,21 @@
 	<select id="selectProjectMemberIds" resultType="String">
 		select users_id from project_members where project_seq = #{project_seq}
 	</select>
+	
+	<select id="getProjectCount" resultType="com.study.app.domains.projects.ProjectCountDTO">
+		select count(*) as allCount,
+				sum(case when status = 'IN_PROGRESS' then 1 else 0 end) as inProgressCount,
+				sum(case when status = 'DONE' then 1 else 0 end) as doneCount
+			from projects p
+       		<where>
+				<if test="role != 'ADMIN'">
+					 p.users_id = #{loginId}
+						or exists ( select 1
+	            		from project_members pm
+			            where pm.project_seq = p.project_seq and pm.users_id = #{loginId}
+       				)
+				</if>
+			</where>
+	</select>
+	
 </mapper>

@@ -2,7 +2,9 @@ package com.study.app.domains.projects;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -196,5 +198,12 @@ public class ProjectsService {
 
 	public void updateTaskStatus(KanbanTaskDTO dto) {
 		kanbanDao.updateTaskStatus(dto);
+	}
+	
+	public ProjectCountDTO getProjectCount(String role, String loginId) {
+		Map<String, String> params = new HashMap<>();
+		params.put("role", role);
+		params.put("loginId", loginId);
+		return projectsDao.getProjectCount(params);
 	}
 }
