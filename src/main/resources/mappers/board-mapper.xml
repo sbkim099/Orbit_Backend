@@ -78,7 +78,7 @@
 	        WHERE CATEGORY != '자유'
 	        ORDER BY CREATED_AT DESC
 	    )
-	    WHERE ROWNUM &lt;= 6
+	    WHERE ROWNUM &lt;= 5
 	</select>
 
 	<select id="getPostDetail" resultType="com.study.app.domains.board.BoardPostsDTO">
