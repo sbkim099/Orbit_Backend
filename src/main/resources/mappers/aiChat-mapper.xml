@@ -15,7 +15,7 @@
 	</update>
 	
 	<insert id="insertMessage">
-		<selectKey keyProperty="chat_seq" resultType="Long" order="BEFORE">
+		<selectKey keyProperty="msg_seq" resultType="Long" order="BEFORE">
 			select msg_seq.nextval from dual
 		</selectKey>
 		insert into ai_messages values(#{msg_seq}, #{chat_seq}, #{role}, #{content}, #{ref_chunk_ids, jdbcType=VARCHAR}, sysdate, #{ref_rag_doc_seq, jdbcType=VARCHAR})
