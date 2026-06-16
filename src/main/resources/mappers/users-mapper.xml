@@ -43,7 +43,7 @@
 	                CASE u.status
 	                    WHEN 'ACTIVE' THEN '재직'
 	                    WHEN 'INACTIVE' THEN '휴직'
-	                    WHEN 'REJECTED' THEN '퇴사'
+	                    WHEN 'RETIRE' THEN '퇴사'
 	                END as status
 	            FROM users u
 	            LEFT JOIN departments d ON u.dept_seq = d.dept_seq
