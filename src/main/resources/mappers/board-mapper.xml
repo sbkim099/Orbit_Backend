@@ -71,6 +71,16 @@
 	    SELECT * FROM BOARD_FILE WHERE FILE_SEQ = #{fileSeq}
 	</select>
 	
+	<select id="getNoticeList" resultType="com.study.app.domains.board.BoardPostsDTO">
+	    SELECT POST_SEQ, TITLE, CATEGORY, USERS_ID, VIEW_COUNT, CREATED_AT
+	    FROM (
+	        SELECT * FROM BOARD_POSTS
+	        WHERE CATEGORY != '자유'
+	        ORDER BY CREATED_AT DESC
+	    )
+	    WHERE ROWNUM &lt;= 5
+	</select>
+
 	<select id="getPostDetail" resultType="com.study.app.domains.board.BoardPostsDTO">
 	    SELECT
 	        b.POST_SEQ,

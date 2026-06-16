@@ -37,14 +37,14 @@ public class UsersService {
 	    int totalCount = dao.getTotalCount(params);
 	    int activeCount = dao.getCountByStatus("ACTIVE", params);
 	    int inactiveCount = dao.getCountByStatus("INACTIVE", params);
-	    int rejectedCount = dao.getCountByStatus("REJECTED", params);
+	    int retireCount = dao.getCountByStatus("RETIRE", params);
 
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("users", users);
 	    result.put("totalCount", totalCount);
 	    result.put("activeCount", activeCount);
 	    result.put("inactiveCount", inactiveCount);
-	    result.put("rejectedCount", rejectedCount);
+	    result.put("retireCount", retireCount);
 
 	    return result;
 	}

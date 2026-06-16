@@ -60,7 +60,7 @@
 	        NVL(A.work_days, 0) AS "work_days",
 	        NVL(A.late_cnt, 0) AS "late_cnt",
 	
-	        (SELECT NVL(ROUND(SUM(REQUEST_MIN), 1), 0)
+	        (SELECT NVL(ROUND(SUM(REQUEST_MIN) / 60, 1), 0)
 	            FROM OVERTIME_REQUEST
 	            WHERE USERS_ID = #{loginId}
 	            AND STATUS = 'APPROVED'

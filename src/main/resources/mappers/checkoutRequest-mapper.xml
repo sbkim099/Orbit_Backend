@@ -65,7 +65,14 @@
 	        CHECKOUT_SEQ.NEXTVAL,
 	        #{attendance_seq},
 	        #{users_id},
-	        TO_DATE(#{checkout_date}, 'YYYY-MM-DD HH24:MI:SS'),
+	        <choose>
+	            <when test="checkout_date != null">
+	                TO_DATE(#{checkout_date}, 'YYYY-MM-DD HH24:MI:SS')
+	            </when>
+	            <otherwise>
+	                NULL
+	            </otherwise>
+	        </choose>,
 	        TO_DATE(#{req_check_out}, 'YYYY-MM-DD HH24:MI:SS'),
 	        #{reason},
 	        'PENDING'

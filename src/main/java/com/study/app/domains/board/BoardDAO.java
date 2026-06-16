@@ -82,4 +82,9 @@ public class BoardDAO {
     	mybatis.update("Board.updateComment",dto);
     }
     
+    //마이페이지 출력용
+    public List<BoardPostsDTO> getNoticeList() {
+	    return mybatis.selectList("Board.getNoticeList");
+	}
+    
 }
