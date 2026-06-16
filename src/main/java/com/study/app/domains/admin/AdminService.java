@@ -198,7 +198,9 @@ public class AdminService {
 	}
 	
 	public void deleteSupplies(List<Long> ids) {
-	    supplyDAO.deleteSupplies(ids);
+		supplyDAO.deleteSupplyReqItemsByIds(ids);//자식들 먼저 삭제
+		supplyDAO.deleteSupplyRentalsByIds(ids);
+	    supplyDAO.deleteSupplies(ids);//부모 나중
 	}
 	
 	public void updateSupplies(SupplyDTO dto) {

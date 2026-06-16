@@ -32,6 +32,21 @@
 	<select id="checkDupCode" resultType="int">
 	    SELECT COUNT(*) FROM SUPPLIES WHERE SUPPLY_CODE = #{supply_code}
 	</select>
+	<delete id="deleteSupplyReqItemsByIds">
+	    DELETE FROM SUPPLY_REQUEST_ITEMS
+	    WHERE SUPPLY_SEQ IN
+	    <foreach collection="list" item="seq" open="(" separator="," close=")">
+	        #{seq}
+	    </foreach>
+	</delete>
+	
+	<delete id="deleteSupplyRentalsByIds">
+	    DELETE FROM SUPPLY_RENTAL
+	    WHERE SUPPLY_SEQ IN
+	    <foreach collection="list" item="seq" open="(" separator="," close=")">
+	        #{seq}
+	    </foreach>
+	</delete>
 	<delete id="deleteSupplies">
 		 DELETE FROM SUPPLIES WHERE SUPPLY_SEQ IN
 			<foreach collection="list" item="seq" open="(" separator="," close=")">
