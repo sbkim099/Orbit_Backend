@@ -1,8 +1,10 @@
 package com.study.app.domains.meetingRooms;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +28,19 @@ public class MeetingRoomsController {
 	}
 	
 	@PostMapping("createReservation")
-	public ResponseEntity<Void> createReservation(@RequestBody RoomRsvnDTO dto,
-													@RequestAttribute String loginId) {
+	public ResponseEntity<?> createReservation(@RequestBody RoomRsvnDTO dto,
+												@RequestAttribute String loginId) {
 		
-		roomServ.createReservation(dto, loginId);
-		return ResponseEntity.ok().build();
+		try {
+			roomServ.createReservation(dto, loginId);
+			return ResponseEntity.ok().build();
+		} catch (RuntimeException e) {
+			if ("CONFLICT".equals(e.getMessage())) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT)
+	                                 .body(Map.of("message", "CONFLICT"));
+			}
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 	
 	@GetMapping("getReservations")

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,8 +85,13 @@ public class MeetingRoomsService {
 		return rsvnDao.getAllMyMeetRsvn(loginId);
 	}
 	
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void createReservation(RoomRsvnDTO dto, String loginId) {
+		int conflict = rsvnDao.checkConflict(dto);
+	    if (conflict > 0) {
+	        throw new RuntimeException("CONFLICT");
+	    }
+	    
 		dto.setUsers_id(loginId);
 		rsvnDao.createReservation(dto);
 		scheServ.addMeetingSchedules(dto, loginId);
