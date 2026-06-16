@@ -1,13 +1,12 @@
 package com.study.app.domains.signup;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import com.study.app.domains.users.UsersDTO;
 
 @Repository
 public class SignupDAO {
@@ -35,8 +34,11 @@ public class SignupDAO {
         return mybatis.selectList("Signup.getAllRequest", param);
     }
 
-    public int getCount(String status){
-        return mybatis.selectOne("Signup.getCount", status);
+    public int getCount(String status, String searchTerm){
+    	Map<String, String> params = new HashMap<>();
+    	params.put("status", status);
+    	params.put("searchTerm", searchTerm);
+        return mybatis.selectOne("Signup.getCount", params);
     }
 
     public Map<String, Integer> getTabCount(){
