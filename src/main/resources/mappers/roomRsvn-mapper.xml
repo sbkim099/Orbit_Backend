@@ -26,6 +26,13 @@
 		order by start_dt desc
 	</select>
 	
+	<select id="checkConflict" resultType="int">
+	    select count(*) from room_rsvn
+	    where room_seq = #{room_seq}
+	    and start_dt &lt; #{end_dt}
+	    and end_dt &gt; #{start_dt}
+	</select>
+	
 	<insert id="createReservation">
 		<selectKey keyProperty="rsvn_seq" resultType="long" order="BEFORE">
 	        select rsvn_seq.nextval from dual

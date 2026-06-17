@@ -95,7 +95,7 @@ public class SignupService {
 
 	    List<SignupDTO> list = dao.getAllRequest(param);
 
-	    int totalCount = dao.getCount(status);
+	    int totalCount = dao.getCount(status, searchTerm);
 
 	    Map<String, Integer> tabCount = dao.getTabCount();
 

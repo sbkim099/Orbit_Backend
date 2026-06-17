@@ -30,6 +30,10 @@ public class RoomRsvnDAO {
 		return mybatis.selectList("RoomRsvn.getAllMyMeetRsvn", users_id);
 	}
 	
+	public int checkConflict(RoomRsvnDTO dto) {
+		return mybatis.selectOne("RoomRsvn.checkConflict", dto);
+	}
+	
 	public void createReservation(RoomRsvnDTO dto) {
 		mybatis.insert("RoomRsvn.createReservation", dto);
 	}

@@ -43,6 +43,9 @@
 			<if test='status != "TOTAL"'>
 				status = #{status}
 			</if>
+			<if test="searchTerm != null and searchTerm != ''">
+				and name like '%' || #{searchTerm} || '%'
+			</if>
 		</where>
 	</select>
 	
