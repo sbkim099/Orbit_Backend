@@ -292,7 +292,6 @@ public class AdminController {
 	    Map<String, Object> countParams = new HashMap<>();
 	    countParams.put("keyword", "");
 
-	    
 	    countParams.put("status", "");
 	    int totalCount = adminServ.getAdminRequestCount(countParams);
 
