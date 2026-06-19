@@ -52,16 +52,10 @@ jobs:
     - name: Execute remote SSH commands
       uses: appleboy/ssh-action@v1.0.3
 
-      env:
-        MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-        MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-
       with:
         host: ${{ secrets.GCP_HOST }}
         username: ${{ secrets.GCP_USERNAME }}
         key: ${{ secrets.GCP_SSH_KEY }}
-
-        envs: MAIL_USERNAME,MAIL_PASSWORD
 
         script: |
           mkdir -p ~/app
@@ -91,13 +85,10 @@ jobs:
           fi
           
           echo "실행할 JAR 파일: $JAR_NAME"
-
-          echo "MAIL_USERNAME=[$MAIL_USERNAME]"
-          echo "MAIL_PASSWORD=[$MAIL_PASSWORD]"
           
           # 3. sudo를 사용한 백그라운드 구동 및 로그 저장
           # ⚠️ sudo와 nohup을 같이 쓸 때는 전체 명령어를 bash -c ''로 감싸주어야 로그 유실과 리다이렉션 에러가 나지 않습니다.
-          sudo bash -c "MAIL_USERNAME=$MAIL_USERNAME MAIL_PASSWORD=$MAIL_PASSWORD nohup java -jar $JAR_NAME > nohup.out 2>&1 < /dev/null &"
+          sudo bash -c "nohup java -Duser.timezone=Asia/Seoul -Doracle.jdbc.timezoneAsRegion=false -jar $JAR_NAME > nohup.out 2>&1 < /dev/null &"
           
           # 4. 정상 종료 처리
           sleep 1
