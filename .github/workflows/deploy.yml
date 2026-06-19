@@ -91,6 +91,9 @@ jobs:
           fi
           
           echo "실행할 JAR 파일: $JAR_NAME"
+
+          echo "MAIL_USERNAME=[$MAIL_USERNAME]"
+          echo "MAIL_PASSWORD=[$MAIL_PASSWORD]"
           
           # 3. sudo를 사용한 백그라운드 구동 및 로그 저장
           # ⚠️ sudo와 nohup을 같이 쓸 때는 전체 명령어를 bash -c ''로 감싸주어야 로그 유실과 리다이렉션 에러가 나지 않습니다.
