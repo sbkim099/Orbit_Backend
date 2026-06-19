@@ -57,6 +57,8 @@ public class MailService {
 
     // 실제 난수 생성 및 인증번호 메일 발송
     private void sendMail(String email) {
+    	System.out.println("fromEmail=[" + fromEmail + "]");
+    	System.out.println("MAIL_USERNAME ENV=[" + System.getenv("MAIL_USERNAME") + "]");
         String code = String.valueOf((int)(Math.random() * 900000) + 100000);
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(3);
         verificationStorage.put(email, new VerificationInfo(code, expiresAt));
