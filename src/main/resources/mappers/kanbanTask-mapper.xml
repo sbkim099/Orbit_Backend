@@ -40,8 +40,8 @@
 	<update id="updateTask">
 		update kanban_task set title = #{title}, content = #{content}, status = #{status},
     						priority = #{priority}, users_pic_id = #{users_pic_id}, 
-    						start_date = TO_TIMESTAMP(#{start_date}, 'YYYY-MM-DD'),
-    						due_date = TO_TIMESTAMP(#{due_date}, 'YYYY-MM-DD'), 
+    						start_date = TO_TIMESTAMP(SUBSTR(#{start_date}, 1, 10), 'YYYY-MM-DD'),
+    						due_date = TO_TIMESTAMP(SUBSTR(#{due_date}, 1, 10), 'YYYY-MM-DD'), 
     						updated_at = sysdate
 						where task_seq = #{task_seq}
 	</update>
