@@ -29,8 +29,8 @@
 	<select id="checkConflict" resultType="int">
 	    select count(*) from room_rsvn
 	    where room_seq = #{room_seq}
-	    and start_dt &lt; #{end_dt}
-	    and end_dt &gt; #{start_dt}
+	    and start_dt &lt; TO_TIMESTAMP(#{end_dt}, 'YYYY-MM-DD HH24:MI:SS')
+	    and end_dt &gt; TO_TIMESTAMP(#{start_dt}, 'YYYY-MM-DD HH24:MI:SS')
 	</select>
 	
 	<insert id="createReservation">
