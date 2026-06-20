@@ -29,7 +29,8 @@
 			select task_seq.nextval from dual
 		</selectKey>
 			insert into kanban_task values(#{task_seq}, #{project_seq}, #{title}, #{content}, #{status}, 
-			#{priority}, #{users_pic_id}, #{start_date}, #{due_date}, #{position}, #{users_c_id}, sysdate, null)
+			#{priority}, #{users_pic_id}, TO_DATE(#{start_date}, 'YYYY-MM-DD'), 
+			TO_DATE(#{due_date}, 'YYYY-MM-DD'), #{position}, #{users_c_id}, sysdate, null)
 	</insert>
 	
 	<select id="getProjectBySeq" resultType="com.study.app.domains.projects.ProjectsDTO">
@@ -38,8 +39,10 @@
 	
 	<update id="updateTask">
 		update kanban_task set title = #{title}, content = #{content}, status = #{status},
-    						priority = #{priority}, users_pic_id = #{users_pic_id}, start_date = #{start_date},
-    						due_date = #{due_date}, updated_at = sysdate
+    						priority = #{priority}, users_pic_id = #{users_pic_id}, 
+    						start_date = TO_DATE(#{start_date}, 'YYYY-MM-DD'),
+    						due_date = TO_DATE(#{due_date}, 'YYYY-MM-DD'), 
+    						updated_at = sysdate
 						where task_seq = #{task_seq}
 	</update>
 	
