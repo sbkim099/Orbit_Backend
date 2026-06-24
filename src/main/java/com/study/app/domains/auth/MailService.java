@@ -33,11 +33,6 @@ public class MailService {
 	@Value("${spring.mail.password}")
 	private String mailPw;
 	
-	@PostConstruct
-    public void test() {
-        System.out.println("MAIL PW LENGTH = " + mailPw.length());
-    }
-	
 	private final JavaMailSender mailSender;
     // 서버 메모리에 이메일과 인증정보를 저장하는 맵
     private final Map<String, VerificationInfo> verificationStorage = new ConcurrentHashMap<>();
@@ -65,10 +60,8 @@ public class MailService {
         return true;
     }
     
-    // 실제 난수 생성 및 인증번호 메일 발송
+    // 난수 생성 및 인증번호 메일 발송
     private void sendMail(String email) {
-    	System.out.println("fromEmail=[" + fromEmail + "]");
-    	System.out.println("MAIL_USERNAME ENV=[" + System.getenv("MAIL_USERNAME") + "]");
         String code = String.valueOf((int)(Math.random() * 900000) + 100000);
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(3);
         verificationStorage.put(email, new VerificationInfo(code, expiresAt));

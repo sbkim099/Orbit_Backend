@@ -18,10 +18,14 @@ public class DraftDocumentsDTO {
 	private List<ApprovalLinesDTO> approvers;
     private List<ApprovalCcDTO> referrers;
     
+    private String name;
+	private String app_status;
+	private String sysname;
+    
     public DraftDocumentsDTO() {}
 	public DraftDocumentsDTO(Long doc_seq, String title, String doc_type, String users_id, String status,
 			String reject_reason, Long is_temp, String temp_expires_at, String created_at, String updated_at,
-			List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers) {
+			List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers, String name, String app_status, String sysname) {
 		super();
 		this.doc_seq = doc_seq;
 		this.title = title;
@@ -35,6 +39,9 @@ public class DraftDocumentsDTO {
 		this.updated_at = updated_at;
 		this.approvers = approvers;
 		this.referrers = referrers;
+		this.name = name;
+		this.app_status = app_status;
+		this.sysname = sysname;
 	}
 	public Long getDoc_seq() {
 		return doc_seq;
@@ -107,82 +114,6 @@ public class DraftDocumentsDTO {
 	}
 	public void setReferrers(List<ApprovalCcDTO> referrers) {
 		this.referrers = referrers;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private String name;
-	private String app_status;
-	private String sysname;
-	public DraftDocumentsDTO(String name, String app_status, String sysname) {
-		super();
-		this.name = name;
-		this.app_status = app_status;
-		this.sysname = sysname;
 	}
 	public String getName() {
 		return name;

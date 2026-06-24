@@ -9,7 +9,7 @@ public class SupplyRequestDTO {
     private LocalDate req_date;//신청일-> 수령 희망 날짜로 변경
     private String reason;
     private String status;
-    //db에 없다
+
     private String user_name;
     private List<SupplyRequestItemsDTO> items;
     
@@ -26,7 +26,6 @@ public class SupplyRequestDTO {
 		this.user_name = user_name;
 		this.items = items;
 	}
-
 
 	public Long getReq_seq() {
 		return req_seq;

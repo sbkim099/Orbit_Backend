@@ -7,7 +7,7 @@ public class BoardCommentsDTO {
     private String content;
     private String created_at;
     private String update_at;
-    //DB엔 없
+
     private String author_name;
     private String author_sysname; 
     

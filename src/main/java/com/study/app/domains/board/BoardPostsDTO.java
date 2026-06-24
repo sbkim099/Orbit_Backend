@@ -3,9 +3,6 @@ package com.study.app.domains.board;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 
- */
 public class BoardPostsDTO {
 	private Long post_seq;       // POST_SEQ (NUMBER)
     private String title;        // TITLE (VARCHAR2)
@@ -15,8 +12,8 @@ public class BoardPostsDTO {
     private int view_count;      // VIEW_COUNT (NUMBER)
     private LocalDateTime created_at;     // CREATED_AT (DATE)
     private String author_name;
-    private String author_sysname;   
-    //쿼리에 없
+    private String author_sysname;  
+    
     private List<BoardFileDTO> files;
     private List<BoardCommentsDTO> comments;
     

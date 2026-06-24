@@ -267,15 +267,4 @@ public class AdminService {
 		
 		return adminDao.adminAiQuestionsData(params);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

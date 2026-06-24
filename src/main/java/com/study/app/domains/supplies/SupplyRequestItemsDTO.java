@@ -7,7 +7,7 @@ public class SupplyRequestItemsDTO {
     private String supply_name;
     private int ea;
     private String use_type;
-    //db에 없음
+
     private Long stock_qty;      
     private Long min_stock_qty;  
     
@@ -89,6 +89,4 @@ public class SupplyRequestItemsDTO {
 	public void setMin_stock_qty(Long min_stock_qty) {
 		this.min_stock_qty = min_stock_qty;
 	}
-
-	
 }

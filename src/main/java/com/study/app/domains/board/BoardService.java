@@ -49,7 +49,6 @@ public class BoardService {
     public String uploadEditorImage(MultipartFile image) throws Exception {
         Map<String, String> fileInfo = fileService.upload(image);
         String sysname = fileInfo.get("sysname");
-//        return fileInfo.get("file_path"); // GCS URL만 반환
         return "http://localhost/board/editorImage/" + sysname;
     }
     

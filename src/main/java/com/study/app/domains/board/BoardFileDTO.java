@@ -65,6 +65,4 @@ public class BoardFileDTO {
 	public void setUpload_at(LocalDateTime upload_at) {
 		this.upload_at = upload_at;
 	}
-    
-    
 }

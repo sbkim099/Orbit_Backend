@@ -141,6 +141,4 @@ public class SupplyRentalDTO {
 	public void setEa(int ea) {
 		this.ea = ea;
 	}
-
-	
 }

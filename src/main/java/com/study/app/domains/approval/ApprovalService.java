@@ -114,7 +114,6 @@ public class ApprovalService {
 		insertCommonApprovalData(dto);
 		dao.insertPaymentDetail(dto);
 
-		// 지출 세부 항목 및 개별 파일 업로드
 		if(dto.getItems() != null) {
 			for(int i = 0; i < dto.getItems().size(); i++) {
 				PaymentItemsDTO item = dto.getItems().get(i);
@@ -126,7 +125,6 @@ public class ApprovalService {
 					try {
 						Map<String, String> upload = fileServ.upload(files.get(i));
 
-						// DB에 저장
 						item.setOriname(upload.get("oriname"));
 						item.setSysname(upload.get("sysname"));
 
@@ -155,7 +153,7 @@ public class ApprovalService {
 				dao.insertPurchaseItem(item);
 			}
 		}
-		// 구매 첨부파일 리스트
+		
 		if(files != null && !files.isEmpty()) {
 			for(MultipartFile file : files) {
 				try {
@@ -179,7 +177,7 @@ public class ApprovalService {
 	public Map<String, Object> getApprovalDetail(String doc_type, Long doc_seq) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        // 공통 정보 조회 (draft_documents)
+        // 공통 정보 조회
         Map<String, Object> common = dao.selectCommonDetail(doc_seq);
         if (common == null) {
             throw new IllegalArgumentException("존재하지 않는 결재 문서입니다.");
@@ -240,18 +238,14 @@ public class ApprovalService {
 
 	@Transactional
 	public void approveDraft(Long doc_seq, String loginId, String doc_type) {
-	    // 현재 결재자의 라인 정보 조회
 	    Map<String, Object> currentLine = dao.selectMyApprovalLine(doc_seq, loginId);
 	    Long currentStepOrder = Long.parseLong(String.valueOf(currentLine.get("step_order")));
 
-	    // 현재 결재자 status -> APPROVED, handle_at -> sysdate
 	    dao.updateApprovalLineStatus(doc_seq, loginId, "APPROVED");
 
-	    // 다음 결재자 조회
 	    Map<String, Object> nextLine = dao.selectNextApprovalLine(doc_seq, currentStepOrder);
 
 	    if (nextLine != null) {
-	        // 중간 결재자 -> 다음 결재자 IN_PROGRESS, 문서 IN_PROGRESS
 	        String nextUsersId = String.valueOf(nextLine.get("users_id"));
 	        dao.updateNextApprovalLineStatus(doc_seq, nextUsersId, "IN_PROGRESS");
 	        dao.updateDocumentStatus(doc_seq, "IN_PROGRESS");
@@ -266,7 +260,6 @@ public class ApprovalService {
 	        noti.setCreated_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 	        notiServ.insertNoti(noti);
 	    } else {
-	        // 마지막 결재자 -> 문서 APPROVED
 	        dao.updateDocumentStatus(doc_seq, "APPROVED");
 	        
 	        Map<String, Object> common = dao.selectCommonDetail(doc_seq);
@@ -283,7 +276,6 @@ public class ApprovalService {
 	        notiServ.insertNoti(noti);
 	        
 	        if(doc_type.equals("VACATION")) {
-	        	// 연차 테이블 반영
 	        	Map<String, Object> vac_info = dao.selectVacationDays(doc_seq);
 	        	String users_id = String.valueOf(vac_info.get("users_id"));
 	        	Double used_days = Double.parseDouble(String.valueOf(vac_info.get("days")));
@@ -302,14 +294,11 @@ public class ApprovalService {
 	
 	@Transactional
 	public void rejectApproval(Long doc_seq, String loginId, String reject_reason) {
-		// 현재 결재자의 라인 정보 조회
 		Map<String, Object> currentLine = dao.selectMyApprovalLine(doc_seq, loginId);
 	    Long currentStepOrder = Long.parseLong(String.valueOf(currentLine.get("step_order")));
 	    
-	    // 현재 결재자 status -> REJECTED, handle_at -> sysdate, reject_reason
 	    dao.updateApprovalLineStatusToReject(doc_seq, loginId, "REJECTED", reject_reason);
 	    
-	    // 문서 status -> REJECTED, reject_reason
 	    dao.updateDocument(doc_seq, "REJECTED", reject_reason);
 	    
 	    Map<String, Object> common = dao.selectCommonDetail(doc_seq);
@@ -337,7 +326,6 @@ public class ApprovalService {
 		}
 		dao.updateDraftDocument(dto);
 
-		// 결재라인 정보 수정
 		dao.deleteApprovalLines(dto.getDoc_seq());
 		if(dto.getApprovers() != null) {
 			for (int i = 0; i < dto.getApprovers().size(); i++) {
@@ -361,7 +349,6 @@ public class ApprovalService {
 			}
 		}
 
-		// 참조자 정보 수정
 		dao.deleteReferrers(dto.getDoc_seq());
 		if(dto.getReferrers() != null) {
 			for (ApprovalCcDTO ref : dto.getReferrers()) {
@@ -468,7 +455,6 @@ public class ApprovalService {
 		
 		dao.deletePurchaseAttachments(purchase_seq);
 		
-		// DTO에 담긴 유지할 기존 파일 재삽입 (프론트에서 삭제 안 한 것들)
 	    if (dto.getAttachments() != null) {
 	        for (PurchaseAttachmentsDTO kept : dto.getAttachments()) {
 	            kept.setPurchase_seq(purchase_seq);

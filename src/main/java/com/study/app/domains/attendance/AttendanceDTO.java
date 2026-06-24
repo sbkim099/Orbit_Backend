@@ -11,7 +11,7 @@ public class AttendanceDTO {
     private LocalDateTime check_out;    
     private Integer total_work_min;
     private Long request_min;
- // DB 컬럼에 없음
+    
     private int work_days;
     private double total_hours;
     private int late_cnt;

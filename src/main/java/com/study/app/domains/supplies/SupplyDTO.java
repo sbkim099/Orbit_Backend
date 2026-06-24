@@ -81,6 +81,4 @@ public class SupplyDTO {
 	public void setCreated_at(LocalDateTime created_at) {
 		this.created_at = created_at;
 	}
-    
-    
 }

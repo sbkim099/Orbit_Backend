@@ -38,10 +38,6 @@ import com.study.app.domains.users.UsersDTO;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-	// 인사관련 mapping 주소 : /hr 로 시작할 것.
-	// 총무관련 mapping 주소 : /ga 로 시작할 것.
-	// 문서관리 : document 만 작성.
-	// AI : ai 만 작성.
 
 	@Autowired
 	private AdminService adminServ;

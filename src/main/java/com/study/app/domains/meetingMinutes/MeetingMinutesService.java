@@ -59,13 +59,13 @@ public class MeetingMinutesService {
 	    minutesDAO.updateMinutes(dto); 
 	    aiChatServ.deleteMeetingRag(dto.getMinute_seq());
 	    aiChatServ.createMeetingChunk(dto);
-	    // 2. [재사용 1] 기존 참석자 싹 지우기
+	    // 2. 기존 참석자 싹 지우기
 	    minutesAttendeesDAO.deleteMinutesAttendees(dto.getMinute_seq()); 
 	    
-	    // 3. [재사용 2] 처음 등록할 때 쓰던 insert 쿼리를 그대로 재사용해서 새로 넣기
+	    // 3. 처음 등록할 때 쓰던 insert 쿼리를 그대로 재사용해서 새로 넣기
 	    if (dto.getAttendees() != null) {
 	        for (MinutesAttendeesDTO emp : dto.getAttendees()) {
-	        	// 꺼내온 emp에 현재 수정 중인 회의록 번호(minute_seq)를 심어줍니다.
+	        	// 꺼내온 emp에 현재 수정 중인 회의록 번호(minute_seq)를 심어줌
 	            emp.setMinute_seq(dto.getMinute_seq());
 	            
 	            //  DTO 객체인 emp를 그대로 매개변수로

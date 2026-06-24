@@ -88,12 +88,10 @@ public class BoardController {
     
 	@GetMapping("/editorImage/{sysname}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String sysname) throws Exception {
-		System.out.println("이미지 요청: " + sysname);  // ← 추가
 	    byte[] imageBytes = fileService.getFileBytes(sysname);
 	    if (imageBytes == null) {
 	        return ResponseEntity.notFound().build();
 	    }
-	    System.out.println("imageBytes: " + (imageBytes == null ? "null" : imageBytes.length));
 	    // 확장자로 Content-Type 추정
 	    String contentType = "image/jpeg";
 	    if (sysname.toLowerCase().endsWith(".png")) contentType = "image/png";
