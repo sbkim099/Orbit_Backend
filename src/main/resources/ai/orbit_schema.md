@@ -182,6 +182,9 @@ WHERE START_DT >= TRUNC(SYSDATE, 'MM')
 
 - 본인 신청 조회는 `EMP_ID = '{loginId}'` 조건을 사용한다.
 - 신청 상태별 조회는 `REQUEST_STATUS` 값을 사용한다.
+- `ROOM_FLOOR`는 문자형 값이며 예: `8층`, `10층` 형식으로 저장된다.
+- 사용자가 “8층”, “8층 회의실”처럼 층수를 말하면 `ROOM_FLOOR_NO = '8층'` 조건을 우선 사용한다.
+- `ROOM_FLOOR = 8`처럼 숫자 비교를 하지 않는다.
 
 ## V_AI_OVERTIME_REQUEST
 
@@ -350,7 +353,7 @@ WHERE START_DT >= TRUNC(SYSDATE, 'MM')
 | `ROOM_SEQ` | 회의실 고유 번호 |
 | `ROOM_NAME` | 회의실 이름 |
 | `MAX_PEOPLE` | 회의실 최대 수용 인원 |
-| `ROOM_FLOOR` | 회의실 층수 |
+| `ROOM_FLOOR` | 회의실 층수 예:`8층`이면 문자열 `8층` |
 | `EMP_ID` | 예약자 로그인 ID |
 | `EMP_NAME` | 예약자 이름 |
 | `DEPT_NAME` | 예약자 부서명 |
