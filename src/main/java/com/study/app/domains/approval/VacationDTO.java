@@ -14,10 +14,12 @@ public class VacationDTO extends DraftDocumentsDTO {
 	
 	private List<ApprovalLinesDTO> approvers;
     private List<ApprovalCcDTO> referrers;
+    private List<VacationAttachmentsDTO> attachments;
 	
 	public VacationDTO() {}
 	public VacationDTO(Long vac_seq, Long doc_seq, String vac_type, String start_date, String end_date, Double days,
-			String reason, Double remaining_days, List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers) {
+			String reason, Double remaining_days, List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers,
+			List<VacationAttachmentsDTO> attachments) {
 		super();
 		this.vac_seq = vac_seq;
 		this.doc_seq = doc_seq;
@@ -29,6 +31,7 @@ public class VacationDTO extends DraftDocumentsDTO {
 		this.remaining_days = remaining_days;
 		this.approvers = approvers;
 		this.referrers = referrers;
+		this.attachments = attachments;
 	}
 	public Long getVac_seq() {
 		return vac_seq;
@@ -89,5 +92,11 @@ public class VacationDTO extends DraftDocumentsDTO {
 	}
 	public void setReferrers(List<ApprovalCcDTO> referrers) {
 		this.referrers = referrers;
+	}
+	public List<VacationAttachmentsDTO> getAttachments() {
+		return attachments;
+	}
+	public void setAttachments(List<VacationAttachmentsDTO> attachments) {
+		this.attachments = attachments;
 	}
 }
