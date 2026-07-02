@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZoneId;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import com.study.app.domains.meetingMinutes.MeetingMinutesDAO;
@@ -118,7 +119,7 @@ public class AiChatService {
 		}
 
 		String route = ragRouteClassifier.classify(content);
-		
+
 		if("DB".equals(route)) {
 			String aiAnswer = dbRagService.answer(loginId, content);
 			AiMessagesDTO aiMessage = new AiMessagesDTO(0L, chat_seq, "AI", aiAnswer, "[]", null, null, "[]");
@@ -166,7 +167,9 @@ public class AiChatService {
 
 		boolean dateQuery = content.matches(".*\\d+월\\s*\\d+일.*")
 				|| content.matches(".*\\d+/\\d+.*")
-				|| content.matches(".*\\d{4}-\\d{2}-\\d{2}.*");
+				|| content.matches(".*\\d{4}-\\d{2}-\\d{2}.*")
+				|| content.contains("어제")
+				|| content.contains("오늘");
 
 		if(dateQuery) {
 			meetingKeyword = true;
@@ -229,65 +232,96 @@ public class AiChatService {
 				})
 				.collect(Collectors.toList());
 
-		Pattern datePattern = Pattern.compile("(\\d+)월\\s*(\\d+)일");
-		Matcher dateMatch = datePattern.matcher(content);
-		String tempDate = null;
+		LocalDate baseDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		List<String> targetDates = new ArrayList<>();
 		Integer targetYear = null;
 		Integer targetMonth = null;
 
-		Pattern isoDatePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
+		if (content.contains("어제")) {
+			targetDates.add(baseDate.minusDays(1).format(dateFormatter));
+		}
+
+		if (content.contains("오늘")) {
+			targetDates.add(baseDate.format(dateFormatter));
+		}
+
+		Pattern isoDatePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
 		Matcher isoDateMatch = isoDatePattern.matcher(content);
 
-		Pattern koreanDatePattern = Pattern.compile("(\\d{1,2})월\\s*(\\d{1,2})일");
+		while (isoDateMatch.find()) {
+			int year = Integer.parseInt(isoDateMatch.group(1));
+			int month = Integer.parseInt(isoDateMatch.group(2));
+			int day = Integer.parseInt(isoDateMatch.group(3));
+
+			targetDates.add(LocalDate.of(year, month, day).format(dateFormatter));
+		}
+
+		Pattern koreanDatePattern = Pattern.compile("(?:(\\d{4})년\\s*)?(\\d{1,2})월\\s*(\\d{1,2})일");
 		Matcher koreanDateMatch = koreanDatePattern.matcher(content);
+
+		while (koreanDateMatch.find()) {
+			int year = koreanDateMatch.group(1) != null
+					? Integer.parseInt(koreanDateMatch.group(1))
+					: baseDate.getYear();
+
+			int month = Integer.parseInt(koreanDateMatch.group(2));
+			int day = Integer.parseInt(koreanDateMatch.group(3));
+
+			targetDates.add(LocalDate.of(year, month, day).format(dateFormatter));
+		}
+
+		targetDates = targetDates.stream()
+				.distinct()
+				.collect(Collectors.toList());
+
+		final List<String> finalTargetDates = targetDates;
 
 		Pattern yearMonthPattern = Pattern.compile("(?:(\\d{4})년\\s*)?(\\d{1,2})월(?:달)?");
 		Matcher yearMonthMatch = yearMonthPattern.matcher(content);
 
-		if(isoDateMatch.find()) {
-			tempDate = isoDateMatch.group(1) + "-" + isoDateMatch.group(2) + "-" + isoDateMatch.group(3);
-		} else if(koreanDateMatch.find()) {
-			int year = LocalDate.now().getYear();
-			int month = Integer.parseInt(koreanDateMatch.group(1));
-			int day = Integer.parseInt(koreanDateMatch.group(2));
-
-			tempDate = String.format("%d-%02d-%02d", year, month, day);
-		}
-
-		if(yearMonthMatch.find()) {
+		if (finalTargetDates.isEmpty() && yearMonthMatch.find()) {
 			targetYear = yearMonthMatch.group(1) != null
 					? Integer.parseInt(yearMonthMatch.group(1))
-							: LocalDate.now().getYear();
+					: baseDate.getYear();
 
 			targetMonth = Integer.parseInt(yearMonthMatch.group(2));
 		}
 
-		final String targetDate = tempDate;
-
-		if(targetDate != null) {
+		if (!finalTargetDates.isEmpty()) {
 			filteredDocs = filteredDocs.stream()
-					.filter(doc -> doc.getText().contains("회의 일자: " + targetDate))
+					.filter(doc -> finalTargetDates.stream()
+							.anyMatch(date -> doc.getText().contains("회의 일자: " + date)))
 					.collect(Collectors.toList());
 		}
 
 		List<Long> forcedMeetingRagDocSeqs = new ArrayList<>();
 
-		if(meetingKeyword && targetDate != null) {
-			Map<String, Object> params = new HashMap<>();
-			params.put("targetDate", targetDate);
-			params.put("loginId", loginId);
+		if (meetingKeyword && !finalTargetDates.isEmpty()) {
+			List<Long> meetingSeqsByDate = new ArrayList<>();
 
-			List<Long> meetingSeqsByDate = meetingMinutesDao.meetingSeqsByDate(params);
+			for (String targetDate : finalTargetDates) {
+				Map<String, Object> params = new HashMap<>();
+				params.put("targetDate", targetDate);
+				params.put("loginId", loginId);
 
-			if(!meetingSeqsByDate.isEmpty()) {
+				meetingSeqsByDate.addAll(meetingMinutesDao.meetingSeqsByDate(params));
+			}
+
+			meetingSeqsByDate = meetingSeqsByDate.stream()
+					.distinct()
+					.collect(Collectors.toList());
+
+			if (!meetingSeqsByDate.isEmpty()) {
 				Map<String, Object> ragParams = new HashMap<>();
 				ragParams.put("meetingSeqs", meetingSeqsByDate);
 
 				forcedMeetingRagDocSeqs = ragDao.findRagDocSeqsByMeetingSeq(ragParams);
 			}
 		}
-		
-		if(meetingKeyword && targetYear != null && targetMonth != null) {
+
+		if (meetingKeyword && finalTargetDates.isEmpty() && targetYear != null && targetMonth != null) {
 			LocalDate startDate = LocalDate.of(targetYear, targetMonth, 1);
 			LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
@@ -298,7 +332,7 @@ public class AiChatService {
 
 			List<Long> meetingSeqsByMonth = meetingMinutesDao.meetingSeqsByMonth(params);
 
-			if(!meetingSeqsByMonth.isEmpty()) {
+			if (!meetingSeqsByMonth.isEmpty()) {
 				Map<String, Object> ragParams = new HashMap<>();
 				ragParams.put("meetingSeqs", meetingSeqsByMonth);
 
@@ -306,18 +340,27 @@ public class AiChatService {
 			}
 		}
 
-		List<Long> ragDocSeqs = filteredDocs.stream()
-				.sorted(
-						Comparator.comparing(
-								SearchResultDTO::getScore
-								).reversed()
-						)
-				.map(SearchResultDTO::getRag_doc_seq)
-				.distinct()
-				.limit(3)
-				.toList();
+		List<Long> ragDocSeqs;
 
-		if (filteredDocs.isEmpty()) {
+		if (!forcedMeetingRagDocSeqs.isEmpty()) {
+			ragDocSeqs = forcedMeetingRagDocSeqs.stream()
+					.distinct()
+					.limit(3)
+					.toList();
+		} else {
+			ragDocSeqs = filteredDocs.stream()
+					.sorted(
+							Comparator.comparing(
+									SearchResultDTO::getScore
+									).reversed()
+							)
+					.map(SearchResultDTO::getRag_doc_seq)
+					.distinct()
+					.limit(3)
+					.toList();
+		}
+
+		if (filteredDocs.isEmpty() && forcedMeetingRagDocSeqs.isEmpty()) {
 			aiResult.put("chat_seq", chat_seq);
 			String failMsg = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
@@ -339,7 +382,7 @@ public class AiChatService {
 
 		double minScore = meetingKeyword ? 0.10 : 0.20;
 
-		if (maxScore < minScore) {
+		if (maxScore < minScore && forcedMeetingRagDocSeqs.isEmpty()) {
 			aiResult.put("chat_seq", chat_seq);
 			String failMsg = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
@@ -418,9 +461,7 @@ public class AiChatService {
 			dbRefRagDocValue = "[]";
 		}
 
-		LocalDate now = LocalDate.now();
-		String currentDate =
-				now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		String currentDate = baseDate.format(dateFormatter);
 
 		String systemPrompt;
 		if(useMeetingPrompt) {
@@ -465,6 +506,8 @@ public class AiChatService {
 					+ " 특정 청크에 정보가 없다는 이유만으로 즉시 찾지 못했다고 답변해서는 안 됩니다."
 					+ "7. 임직원을 대하는 격식있고 명확한 비즈니스 어조(한글 존댓말)를 유지하세요. 답변의 마지막에는 항상 '추가로 궁금하신 사항이 있으시면 언제든 말씀해 주시길 바랍니다.'라는 정중한 맺음말을 붙이십시오."
 					+ "8. **[출력 포맷팅]**: 임직원이 보기 편하도록 항목별 줄바꿈을 적극 활용하고, 소분류나 상세 내용에는 -(하이픈)을 활용하여 가독성 높게 출력하세요."
+					+ "9. 오늘 날짜는 " + currentDate + "입니다."
+					+ "사용자가 '어제'라고 표현한 경우 오늘 날짜의 하루 전 날짜로 해석하고, '오늘'이라고 표현한 경우 오늘 날짜로 해석하세요."
 					+ ""
 					+ "[지정된 출력 형식 (전체 요약용)]"
 					+ "1. 회의 개요"
