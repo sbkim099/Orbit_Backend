@@ -13,7 +13,7 @@ public class CORSConfig implements WebMvcConfigurer{
 		registry.addMapping("/**")
 		.allowedMethods("*")
 		.allowedHeaders("*")
-		.allowedOrigins("https://sukong.shop", "http://localhost:5173")
+		.allowedOrigins("https://sukong.shop", "http://localhost:5173", "https://apato.shop")
 		.allowCredentials(true); // 쿠키나 인증 헤더(Authorization)를 통신에 포함할지 여부 (로그인 연동 시 필요)
 	}
 }
