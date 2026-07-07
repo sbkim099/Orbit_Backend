@@ -94,7 +94,6 @@ jobs:
   # 2. GCP B (데모 환경 - Demo / apato.shop) 배포 Job
   # --------------------------------------------------
   deploy-to-gcp-b:
-    if: false   # ⚠️ demo 서버 준비되면 이 줄 삭제하고 다시 활성화
     runs-on: ubuntu-latest
     environment: demo
 
