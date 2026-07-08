@@ -43,7 +43,7 @@
 	                u.users_seq, u.name, u.id, u.role, u.hire_date,
 	                u.dept_seq, u.rank_seq,
 	                u.is_hr_manager,
-	                d.dept_name, r.rank_name,
+	                d.dept_name, d.auth_group, r.rank_name,
 	                CASE u.status
 	                    WHEN 'ACTIVE' THEN '재직'
 	                    WHEN 'INACTIVE' THEN '휴직'
@@ -147,12 +147,12 @@
         d.dept_name AS dept_name,
         d.parent_dept_seq AS parent_dept_seq,
         d.auth_group AS auth_group,
-        r.rank_name AS rank_name, r.rank_seq AS rank_seq
+        r.rank_name AS rank_name, r.rank_seq AS rank_seq, r.rank_order AS rank_order
     FROM users u
     LEFT JOIN departments d ON u.dept_seq = d.dept_seq
     LEFT JOIN rank r ON u.rank_seq = r.rank_seq
     WHERE u.status = 'ACTIVE'
-    ORDER BY u.rank_seq
+    ORDER BY r.rank_order
 	</select>
 	
 	<select id="getMyPageInfo" resultType="com.study.app.domains.users.UsersDTO">

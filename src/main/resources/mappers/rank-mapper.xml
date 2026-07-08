@@ -3,8 +3,8 @@
 <mapper namespace="Rank">
 
 	<select id="getRankList" resultType="com.study.app.domains.rank.RankDTO">
-		select rank_seq, rank_name from rank 
-		where rank_seq != 9
-		order by rank_seq desc
+		select rank_seq, rank_name, rank_order from rank 
+		where rank_order != 0
+		order by rank_order
 	</select>
 </mapper>
