@@ -61,6 +61,8 @@ public class BoardController {
             boardServ.writePost(post, files);
             return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 등록되었습니다.");
 
+        } catch (java.nio.file.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (Exception e) {
         	e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -189,9 +191,12 @@ public class BoardController {
             post.setCategory(category);
             post.setTitle(title);
             post.setContent(content);
+            post.setUsers_id(loginId);
 
             boardServ.updatePost(post, newFiles, deletedFileSeqs,deletedImageUrls);
             return ResponseEntity.ok("게시글이 수정되었습니다.");
+        } catch (java.nio.file.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

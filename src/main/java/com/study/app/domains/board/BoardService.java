@@ -1,17 +1,17 @@
 package com.study.app.domains.board;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.study.app.domains.file.FileService;
+import com.study.app.domains.users.UsersDTO;
+import com.study.app.domains.users.UsersService;
 
 @Service
 public class BoardService {
@@ -20,10 +20,22 @@ public class BoardService {
 	
     @Autowired
     private FileService fileService; 
-	   
+    @Autowired
+    private UsersService usersService;
+
+    public void checkNoticePermission(String loginId, String category) throws AccessDeniedException {
+        if (!"자유".equals(category)) {
+            UsersDTO loginUser = usersService.getUsersInfo(loginId);
+            String authGroup = loginUser.getAuth_group();
+            if (!"ROLE_HR_ADMIN".equals(authGroup) && !"ROLE_SUPER_ADMIN".equals(authGroup)) {
+                throw new AccessDeniedException("공지성 게시글 작성 권한이 없습니다.");
+            }
+        }
+    }
+    
 	@Transactional //여러 DB 작업을 하나로 묶어주는 어노테이션
 	public void writePost(BoardPostsDTO post, List<MultipartFile> files) throws Exception {
-
+		checkNoticePermission(post.getUsers_id(), post.getCategory());
 	    // 게시글 저장
 	    boardDAO.insertPost(post);
 
@@ -118,6 +130,7 @@ public class BoardService {
     public void updatePost(BoardPostsDTO post, List<MultipartFile> newFiles, 
     		List<Long> deletedFileSeqs, List<String> deletedImageUrls) throws Exception {
         
+    	checkNoticePermission(post.getUsers_id(), post.getCategory());
         // 1. 게시글 수정
         boardDAO.updatePost(post);
         
