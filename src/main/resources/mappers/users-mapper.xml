@@ -127,7 +127,7 @@
         name = #{name},
         dept_seq = NVL(#{dept_seq, jdbcType=NUMERIC}, dept_seq),
         rank_seq = NVL(#{rank_seq, jdbcType=NUMERIC}, rank_seq),
-        role = #{role, jdbcType=VARCHAR},
+        role = NVL(#{role, jdbcType=VARCHAR}, role),
         is_hr_manager = NVL(#{is_hr_manager, jdbcType=CHAR}, is_hr_manager),
         update_at = sysdate
     where users_seq = #{users_seq}
