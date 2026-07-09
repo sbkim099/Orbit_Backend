@@ -196,9 +196,10 @@ public class AiChatService {
 			String failMsg = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
-					failMsg, null, null, null, null));
+			AiMessagesDTO aiMessage = new AiMessagesDTO(0L, chat_seq, "AI", failMsg, "[]", null, null, "[]");
+			aiDao.insertMessage(aiMessage);
 
+			aiResult.put("msg_seq", aiMessage.getMsg_seq());
 			aiResult.put("aiAnswer", failMsg);
 			aiResult.put("resultSources", Collections.emptyList());
 
@@ -365,9 +366,10 @@ public class AiChatService {
 			String failMsg = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
-					failMsg, null, null, null, null));
+			AiMessagesDTO aiMessage = new AiMessagesDTO(0L, chat_seq, "AI", failMsg, "[]", null, null, "[]");
+			aiDao.insertMessage(aiMessage);
 
+			aiResult.put("msg_seq", aiMessage.getMsg_seq());
 			aiResult.put("aiAnswer", failMsg);
 			aiResult.put("resultSources", Collections.emptyList());
 
@@ -387,9 +389,10 @@ public class AiChatService {
 			String failMsg = "사내 데이터베이스에서 '" + content + "'와(과) 관련된 규정이나 가이드를 찾지 못했습니다. 😢\n"
 					+ "정확한 안내를 위해 해당 질문은 관리자에게 문의해 주세요.";
 
-			aiDao.insertMessage(new AiMessagesDTO(0L, chat_seq, "AI",
-					failMsg, null, null, null, null));
+			AiMessagesDTO aiMessage = new AiMessagesDTO(0L, chat_seq, "AI", failMsg, "[]", null, null, "[]");
+			aiDao.insertMessage(aiMessage);
 
+			aiResult.put("msg_seq", aiMessage.getMsg_seq());
 			aiResult.put("aiAnswer", failMsg);
 			aiResult.put("resultSources", Collections.emptyList());
 
