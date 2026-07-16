@@ -15,4 +15,8 @@ public class RankDAO {
 	public List<RankDTO> getRankList(){
 		return mybatis.selectList("Rank.getRankList");
 	}
+	
+	public void insertRank(RankDTO dto) {
+		mybatis.insert("Rank.insertRank", dto);
+	}
 }

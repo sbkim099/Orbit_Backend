@@ -7,4 +7,15 @@
 		where rank_order != 0
 		order by rank_order
 	</select>
+	
+	<insert id="insertRank">
+		insert into rank(
+			rank_seq,
+			rank_name,
+			rank_order
+		)
+		values(rank_seq.nextval, #{rank_name},
+			(select nvl(max(rank_order), 0) + 1 from rank)
+		)
+	</insert>
 </mapper>

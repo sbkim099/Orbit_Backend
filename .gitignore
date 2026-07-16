@@ -37,3 +37,6 @@ src/main/resources/application-secret.properties
 
 ### GCP_Key.json ###
 src/main/resources/GCP_Key.json
+
+### application-local.properties ###
+src/main/resources/application-local.properties
