@@ -458,6 +458,12 @@ public class AdminController {
 		return ResponseEntity.ok().build();
 	}
 	
+	@PostMapping("/hr/insertRank")
+	public ResponseEntity<Void> insertRank(@RequestBody RankDTO dto) {
+		adminServ.insertRank(dto);
+		System.out.println("insert");
+		return ResponseEntity.ok().build();
+	}
 	
 	
 	
