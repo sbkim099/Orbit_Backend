@@ -37,4 +37,27 @@
 		update annual_leave set total_days = #{total_days}, remaining_days = #{remaining_days} 
 		where leave_seq = #{leave_seq}
 	</update>
+	
+<!--	연차 관리
+	<select id="selectAllLeaveList" resultType="com.study.app.domains.annualLeave.AdminLeaveListDTO">
+	    SELECT
+	        u.id            AS "users_id",
+	        u.name          AS "name",
+	        u.dept_name     AS "dept_name",
+	        u.rank_name     AS "rank_name",
+	        TO_CHAR(u.hire_date, 'YYYY-MM-DD') AS "hire_date",
+	        a.leave_seq     AS "leave_seq",
+	        a.total_days    AS "total_days",
+	        a.used_days     AS "used_days",
+	        a.remaining_days AS "remaining_days"
+	    FROM users u
+	    JOIN annual_leave a ON u.id = a.users_id
+	    WHERE a.year = TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY'))
+	    <if test="keyword != null and keyword != ''">
+	        AND (u.id LIKE '%' || #{keyword} || '%'
+	             OR u.name LIKE '%' || #{keyword} || '%'
+	             OR u.dept_name LIKE '%' || #{keyword} || '%')
+	    </if>
+	    ORDER BY u.id
+	</select>-->
 </mapper>
