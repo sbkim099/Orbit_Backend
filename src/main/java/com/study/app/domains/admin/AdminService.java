@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
@@ -354,6 +355,44 @@ public class AdminService {
 	
 	public void insertRank(RankDTO dto) {
 		rankDao.insertRank(dto);
+	}
+	
+	public void updateRank(RankDTO dto) {
+		rankDao.updateRank(dto);
+	}
+	
+	@Transactional
+	public void deleteRank(Long rank_seq) {
+		int userCount = rankDao.countUsersByRank(rank_seq);
+		if(userCount > 0) {
+			throw new IllegalStateException(
+					"해당 직급을 사용하는 직원이 있어 삭제할 수 없습니다.\n"
+					+ "해당 직급에 포함된 직원을\n다른 직급으로 변경 후 다시 시도해 주세요."
+			);
+		}
+		
+		int result = rankDao.deleteRank(rank_seq);
+		if(result == 0) {
+			throw new IllegalStateException(
+					"삭제할 직급을 찾을 수 없습니다."
+			);
+		}
+		rankDao.reorderRanks();
+	}
+	
+	@Transactional
+	public void updateRankOrder(List<RankDTO> list) {
+		if(list == null || list.isEmpty()) {
+			throw new IllegalStateException("변경할 직급 순서가 없습니다.");
+		}
+		
+		for(RankDTO rank : list) {
+			int result = rankDao.updateRankOrder(rank);
+			
+			if(result == 0) {
+				throw new IllegalStateException("직급 순서를 변경하지 못했습니다.");
+			}
+		}
 	}
 
 
