@@ -7,10 +7,11 @@ public class AnnualLeaveDTO {
 	private Double total_days;
 	private Double used_days;
 	private Double remaining_days;
+	private Double admin_days;
 	
 	public AnnualLeaveDTO() {}
 	public AnnualLeaveDTO(Long leave_seq, String users_id, Long year, Double total_days, Double used_days,
-			Double remaining_days) {
+			Double remaining_days, Double admin_days) {
 		super();
 		this.leave_seq = leave_seq;
 		this.users_id = users_id;
@@ -18,6 +19,7 @@ public class AnnualLeaveDTO {
 		this.total_days = total_days;
 		this.used_days = used_days;
 		this.remaining_days = remaining_days;
+		this.admin_days = admin_days;
 	}
 	public Long getLeave_seq() {
 		return leave_seq;
@@ -55,4 +57,11 @@ public class AnnualLeaveDTO {
 	public void setRemaining_days(Double remaining_days) {
 		this.remaining_days = remaining_days;
 	}
+	public Double getAdmin_days() {
+		return admin_days;
+	}
+	public void setAdmin_days(Double admin_days) {
+		this.admin_days = admin_days;
+	}
+	
 }
