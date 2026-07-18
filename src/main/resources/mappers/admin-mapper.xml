@@ -78,7 +78,7 @@
 		left join (
 			select
 				connect_by_root d.dept_seq as top_dept_seq,
-				d.dept_seq as child_dapt_seq
+				d.dept_seq as child_dept_seq
 			from departments d
 			
 			start with d.parent_dept_seq = (

@@ -158,7 +158,7 @@ public class AdminService {
 	}
 
 	public List<DeptLeaveDTO> getDeptLeave() {
-		return adminDao.getDeptLeave(appMode);	
+		return adminDao.getDeptLeave();	
 	}
 
 	public Map<String, Object> joinResignCount() {
