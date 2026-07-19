@@ -226,8 +226,8 @@ public class AdminController {
 	
 	@GetMapping("/ai/myDeptQuestion")
 	public ResponseEntity<List<AiUnansweredQuestionsDTO>> myDeptQuestion(
-			@RequestParam Long dept_seq, @RequestParam String auth_group) {
-		return ResponseEntity.ok(adminServ.myDeptQuestion(dept_seq, auth_group));
+			@RequestParam Long dept_seq, @RequestParam boolean is_super_admin) {
+		return ResponseEntity.ok(adminServ.myDeptQuestion(dept_seq, is_super_admin));
 	}
 	
 	@PutMapping("/ai/insertUpdateAnswer")
@@ -241,6 +241,12 @@ public class AdminController {
 	public ResponseEntity<Void> deleteAnswer(@PathVariable Long question_seq) {
 		adminServ.deleteAnswer(question_seq);
 		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/ai/adminAiQuestionsData")
+	public ResponseEntity<AiQuestionCountDTO> adminAiQuestionsData(
+			@RequestParam Long dept_seq, @RequestParam boolean is_super_admin) {
+		return ResponseEntity.ok(adminServ.adminAiQuestionsData(dept_seq, is_super_admin));
 	}
 	
 	/*비품 관련*/
@@ -421,12 +427,6 @@ public class AdminController {
 		
 		adminServ.rejectOvertime(overtime_seq, loginId);
 		return ResponseEntity.ok().build();
-	}
-	
-	@GetMapping("/ai/adminAiQuestionsData")
-	public ResponseEntity<AiQuestionCountDTO> adminAiQuestionsData(
-			@RequestParam Long dept_seq, @RequestParam String auth_group) {
-		return ResponseEntity.ok(adminServ.adminAiQuestionsData(dept_seq, auth_group));
 	}
 	
 	@GetMapping("/company/getCompanyInfo")
