@@ -244,10 +244,10 @@ public class AdminService {
 		return adminDao.getAiQuestions();
 	}
 
-	public List<AiUnansweredQuestionsDTO> myDeptQuestion(Long dept_seq, String auth_group) {
+	public List<AiUnansweredQuestionsDTO> myDeptQuestion(Long dept_seq, boolean is_super_admin) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("dept_seq", dept_seq);
-		params.put("auth_group", auth_group);
+		params.put("is_super_admin", is_super_admin);
 		return adminDao.myDeptQuestion(params);
 	}
 
@@ -259,6 +259,13 @@ public class AdminService {
 		adminDao.deleteAnswer(question_seq);
 	}
 
+	public AiQuestionCountDTO adminAiQuestionsData(Long dept_seq, boolean is_super_admin) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("dept_seq", dept_seq);
+		params.put("is_super_admin", is_super_admin);
+
+		return adminDao.adminAiQuestionsData(params);
+	}
 
 	/*비품 관련*/
 	public List<SupplyDTO> getSupplyList(){
@@ -330,14 +337,6 @@ public class AdminService {
 
 	public void rejectOvertime(Long overtime_seq, String loginId) {
 		overtimeServ.rejectOvertime(overtime_seq, loginId);
-	}
-
-	public AiQuestionCountDTO adminAiQuestionsData(Long dept_seq, String auth_group) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("dept_seq", dept_seq);
-		params.put("auth_group", auth_group);
-
-		return adminDao.adminAiQuestionsData(params);
 	}
 
 	public CompanyInfoDTO getCompanyInfo() {

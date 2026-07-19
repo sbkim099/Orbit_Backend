@@ -174,7 +174,7 @@
 			left join users u2 on q.users_handle_id = u2.id
 			
 			<where>
-				<if test="auth_group != 'ROLE_SUPER_ADMIN'">
+				<if test="!is_super_admin">
 					q.dept_seq = #{dept_seq}
 				</if>
 			</where>
@@ -200,7 +200,7 @@
 		from ai_unanswered_questions
 		
 			<where>
-				<if test="auth_group != 'ROLE_SUPER_ADMIN'">
+				<if test="!is_super_admin">
 					dept_seq = #{dept_seq}
 				</if>
 			</where>
