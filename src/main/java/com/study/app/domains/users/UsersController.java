@@ -62,5 +62,13 @@ public class UsersController {
 	    Map<String, String> uploadResult = usersServ.uploadUserStamp(loginId, file);
 	    return ResponseEntity.ok(uploadResult);
 	}
+	
+	@PutMapping("/myPage/updateProfileFile")
+	public ResponseEntity<Map<String, String>> updateProfileFile(@RequestAttribute String loginId,
+			@RequestParam("file") MultipartFile file) throws Exception{
+		
+		Map<String, String> result = usersServ.updateProfileFile(loginId, file);
+		return ResponseEntity.ok(result);
+	}
 
 }

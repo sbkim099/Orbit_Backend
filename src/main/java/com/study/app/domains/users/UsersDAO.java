@@ -131,4 +131,12 @@ public class UsersDAO {
 	public String selectUserStampSysname(String users_id) {
 		return batis.selectOne("Users.selectUserStampSysname", users_id);
 	}
+	
+	public String findProfileSysname(String users_id) {
+		return batis.selectOne("Users.findProfileSysname", users_id);
+	}
+	
+	public int updateProfileImage(Map<String, Object> params) {
+		return batis.update("Users.updateProfileImage", params);
+	}
 }
