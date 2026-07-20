@@ -5,7 +5,7 @@ public class CertIssueRequestDTO {
 	private Long cert_request_seq;
 	private Long cert_type_seq;
 	private String users_id;
-	private String requset_reason;
+	private String request_reason;
 	private String status;
 	private String requested_at;
 	private String hanble_id;
@@ -23,7 +23,7 @@ public class CertIssueRequestDTO {
 	
 	public CertIssueRequestDTO() {}
 	
-	public CertIssueRequestDTO(Long cert_request_seq, Long cert_type_seq, String users_id, String requset_reason,
+	public CertIssueRequestDTO(Long cert_request_seq, Long cert_type_seq, String users_id, String request_reason,
 			String status, String requested_at, String hanble_id, String approved_at, String rejected_at,
 			String reject_reason, String canceled_at, String print_available_at, String print_expires_at,
 			Long applied_print_days, Long applied_max_print, Long printed_count, String created_at, String updated_at) {
@@ -31,7 +31,7 @@ public class CertIssueRequestDTO {
 		this.cert_request_seq = cert_request_seq;
 		this.cert_type_seq = cert_type_seq;
 		this.users_id = users_id;
-		this.requset_reason = requset_reason;
+		this.request_reason = request_reason;
 		this.status = status;
 		this.requested_at = requested_at;
 		this.hanble_id = hanble_id;
@@ -66,11 +66,11 @@ public class CertIssueRequestDTO {
 	public void setUsers_id(String users_id) {
 		this.users_id = users_id;
 	}
-	public String getRequset_reason() {
-		return requset_reason;
+	public String getRequest_reason() {
+		return request_reason;
 	}
-	public void setRequset_reason(String requset_reason) {
-		this.requset_reason = requset_reason;
+	public void setRequest_reason(String request_reason) {
+		this.request_reason = request_reason;
 	}
 	public String getStatus() {
 		return status;

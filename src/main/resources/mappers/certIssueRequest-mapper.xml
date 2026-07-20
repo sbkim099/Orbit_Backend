@@ -3,8 +3,11 @@
 <mapper namespace="CertIssueRequest">
 	
 	<insert id="insertCertRequest">
-		insert into cert_issue_request values(
-			
-		)
+		insert into cert_issue_request ( 
+			cert_request_seq,
+			cert_type_seq,
+			users_id,
+			request_reason
+		) values ( cert_request_seq.nextval, #{dto.cert_type_seq}, #{loginId}, #{dto.request_reason})
 	</insert>
 </mapper>
