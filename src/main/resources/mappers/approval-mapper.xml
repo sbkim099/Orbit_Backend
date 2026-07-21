@@ -7,8 +7,8 @@
 	        select doc_seq.nextval from dual
 	    </selectKey>
 	    
-	    insert into draft_documents values (#{doc_seq}, #{title}, #{doc_type}, #{users_id}, 
-	    #{status}, null, #{is_temp}, TO_DATE(#{temp_expires_at, jdbcType=VARCHAR}, 'YYYY-MM-DD'), sysdate, sysdate, #{stamp_sysname, jdbcType=VARCHAR})
+	    insert into draft_documents values (#{doc_seq}, #{title}, #{doc_type}, #{users_id}, #{status}, null, #{is_temp}, 
+	    TO_DATE(#{temp_expires_at, jdbcType=VARCHAR}, 'YYYY-MM-DD'), sysdate, sysdate, #{stamp_sysname, jdbcType=VARCHAR}, null)
 	</insert>
 	
 	<insert id="insertApprovalLines">
@@ -25,7 +25,7 @@
 			select vac_seq.nextval from dual
 		</selectKey>
 		insert into vacation values (#{vac_seq}, #{doc_seq}, #{vac_type}, TO_DATE(#{start_date}, 'YYYY-MM-DD'), 
-    	TO_DATE(#{end_date}, 'YYYY-MM-DD'), #{days}, #{reason}, #{remaining_days})
+    	TO_DATE(#{end_date}, 'YYYY-MM-DD'), #{days}, #{reason}, #{remaining_days}, 'N')
 	</insert>
 	
 	<select id="selectVacationOldSysnames" resultType="string">
@@ -87,12 +87,17 @@
 		insert into purchase_attachments values (attachment_seq.nextval, #{purchase_seq}, #{oriname}, #{sysname}, sysdate)
 	</insert>
 	
+	<insert id="insertCancelVacation">
+		insert into cancel_vacation values (cancel_seq.nextval, #{doc_seq}, #{vac_seq, jdbcType=NUMERIC}, #{cancel_reason, jdbcType=VARCHAR})
+	</insert>
+	
 	<select id="selectCommonDetail" resultType="map">
 	    select
-	    	d.doc_seq as "doc_seq", d.title as "title", d.doc_type as "doc_type", d.users_id as "users_id", d.status as "status",
-	    	d.reject_reason as "reject_reason", d.is_temp as "is_temp", TO_CHAR(d.temp_expires_at, 'YYYY-MM-DD') as "temp_expires_at", TO_CHAR(d.created_at, 'YYYY-MM-DD') as "created_at",
-	    	TO_CHAR(d.updated_at, 'YYYY-MM-DD') as "updated_at", d.stamp_sysname as "stamp_sysname", u.name as "name", u.users_seq as "users_seq", dept.dept_name as "dept_name", r.rank_name as "rank_name"
-	    	from draft_documents d
+	    	d.doc_seq as "doc_seq", d.title as "title", d.doc_type as "doc_type", d.users_id as "users_id", d.status as "status", d.reject_reason as "reject_reason", d.is_temp as "is_temp", 
+	    	TO_CHAR(d.temp_expires_at, 'YYYY-MM-DD') as "temp_expires_at", TO_CHAR(d.created_at, 'YYYY-MM-DD') as "created_at",
+	    	TO_CHAR(d.updated_at, 'YYYY-MM-DD') as "updated_at", d.stamp_sysname as "stamp_sysname", d.resubmit_doc_seq as "resubmit_doc_seq", 
+	    	u.name as "name", u.users_seq as "users_seq", dept.dept_name as "dept_name", r.rank_name as "rank_name"
+	    from draft_documents d
 	    left outer join users u 
 	    	on d.users_id = u.id
 	    left outer join departments dept 
@@ -187,6 +192,16 @@
 		from purchase_attachments where purchase_seq = #{purchase_seq} order by attachment_seq
 	</select>
 	
+	<select id="selectCancelVacationDetail" resultType="map">
+		select
+			cv.cancel_seq as "cancel_seq", cv.vac_seq as "vac_seq", cv.cancel_reason as "cancel_reason", d.title as "target_title", 
+			v.vac_type as "vac_type", TO_CHAR(v.start_date, 'YYYY-MM-DD') as "start_date", TO_CHAR(v.end_date, 'YYYY-MM-DD') as "end_date", v.days as "days"
+	    from cancel_vacation cv
+	    join vacation v on cv.vac_seq = v.vac_seq
+	    join draft_documents d on d.doc_seq = v.doc_seq
+	    where cv.doc_seq = #{doc_seq}
+	</select>
+	
 	<select id="selectMyApprovalLine" resultType="map">
 		select
 			users_id as "users_id", step_order as "step_order"
@@ -229,6 +244,14 @@
 		where d.doc_seq = #{doc_seq}
 	</select>
 	
+	<select id="selectVacInfoByVacSeq" resultType="map">
+		select
+			d.users_id as "users_id", v.days as "days"
+		from draft_documents d
+		join vacation v on d.doc_seq = v.doc_seq
+		where v.vac_seq = #{vac_seq}
+	</select>
+	
 	<update id="updateDraftDocument">
 		update draft_documents 
 		set title = #{title}, status = #{status}, is_temp = #{is_temp}, 
@@ -244,6 +267,10 @@
 	<delete id="deleteReferrers">
 		delete from approval_cc where doc_seq = #{doc_seq}
 	</delete>
+	
+	<update id="updateCancelVacation">
+		update cancel_vacation set vac_seq = #{vac_seq, jdbcType=NUMERIC}, cancel_reason = #{cancel_reason, jdbcType=VARCHAR} where doc_seq = #{doc_seq}
+	</update>
 	
 	<select id="selectVac_seq" resultType="long">
 		select vac_seq from vacation where doc_seq = #{doc_seq}
@@ -407,7 +434,7 @@
 	</select>
 	
 	<select id="getMyDoc" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
-		select d.*, u.name as name 
+		select d.*, u.name as name
 			from draft_documents d 
 			inner join users u on d.users_id = u.id
 			where d.users_id = #{loginId} and d.status != 'TEMP'
@@ -416,9 +443,10 @@
 	
 	<select id="getMyDocPage" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
 		select * from (select row_number() over(order by d.created_at desc) rn, 
-			d.*, u.name as name
+			d.*, u.name as name, v.cancel_yn AS cancel_yn
 			from draft_documents d
 			inner join users u on d.users_id = u.id
+			left join vacation v on d.doc_seq = v.doc_seq
 			where d.users_id = #{loginId} and d.status = #{status}
 			
 			<if test="keyword != null and keyword != ''">
@@ -459,10 +487,11 @@
 	
 	<select id="getMyDoneDocByPage" resultType="com.study.app.domains.approval.DraftDocumentsDTO">
 		select * from (select row_number() over(order by a.handle_at desc) rn, 
-			d.*, u.name as name, u.sysname as sysname, a.status as my_approval_status
+			d.*, u.name as name, u.sysname as sysname, a.status as my_approval_status, v.cancel_yn as cancel_yn
 			from approval_lines a
 			inner join draft_documents d on a.doc_seq = d.doc_seq
 			inner join users u on d.users_id = u.id
+			left join vacation v on d.doc_seq = v.doc_seq
 			where a.users_id = #{loginId} 
 			and a.status in ('APPROVED', 'REJECTED')
 			and d.status != 'TEMP'
@@ -563,7 +592,11 @@
 	<delete id ="deletePurDoc">
 		delete from purchase where doc_seq = #{doc_seq}
 	</delete>
-
+	
+	<delete id="deleteCancelVacDoc">
+		delete from cancel_vacation where doc_seq = #{doc_seq}
+	</delete>
+	
 	<select id="getNotiDocType" resultType="String">
 		select doc_type from draft_documents where doc_seq = #{doc_seq}
 	</select>
@@ -624,4 +657,33 @@
 			(select general_seq from general where doc_seq = #{doc_seq}
 		)
 	</delete>
+	
+	<update id="updateResubmitDocSeq">
+		update draft_documents set resubmit_doc_seq = #{newDocSeq} where doc_seq = #{originalDocSeq}
+	</update>
+	
+	<select id="getApprovedVacationList" resultType="com.study.app.domains.approval.VacationDTO">
+		select 
+			v.vac_seq, v.doc_seq, v.vac_type, TO_CHAR(v.start_date, 'YYYY-MM-DD') as start_date,
+			TO_CHAR(v.end_date, 'YYYY-MM-DD') as end_date, v.days, d.title as "target_title"
+		from vacation v 
+		join draft_documents d on v.doc_seq = d.doc_seq 
+		where d.users_id = #{loginId}
+		and d.status = 'APPROVED'
+		and v.vac_seq not in (
+		    select cv.vac_seq
+		    from cancel_vacation cv
+		    join draft_documents d on cv.doc_seq = d.doc_seq
+		    where d.status != 'REJECTED'
+		)
+		order by v.start_date desc
+	</select>
+	
+	<select id="selectCancelVacSeq" resultType="long">
+		select vac_seq from cancel_vacation where doc_seq = #{doc_seq}
+	</select>
+	
+	<update id="updateVacCancelYn">
+		update vacation set cancel_yn = 'Y' where vac_seq = #{vac_seq}
+	</update>
 </mapper>
