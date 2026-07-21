@@ -26,6 +26,8 @@ public class CertTypeDTO {
 	private Long applied_print_days;
 	private Long applied_max_print;
 	private Long printed_count;
+	private String issue_date_code;
+	private Long issue_no;
 	
 	public CertTypeDTO() {}
 	
@@ -176,5 +178,17 @@ public class CertTypeDTO {
 	}
 	public void setPrinted_count(Long printed_count) {
 		this.printed_count = printed_count;
+	}
+	public String getIssue_date_code() {
+		return issue_date_code;
+	}
+	public void setIssue_date_code(String issue_date_code) {
+		this.issue_date_code = issue_date_code;
+	}
+	public Long getIssue_no() {
+		return issue_no;
+	}
+	public void setIssue_no(Long issue_no) {
+		this.issue_no = issue_no;
 	}
 }
