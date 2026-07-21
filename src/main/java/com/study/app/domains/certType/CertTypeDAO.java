@@ -15,4 +15,12 @@ public class CertTypeDAO {
 	public List<CertTypeDTO> getCertType(String loginId) {
 		return mybatis.selectList("CertType.getCertType", loginId);
 	}
+	
+	public List<CertTypeDTO> getAdminCertTypeList() {
+		return mybatis.selectList("CertType.getAdminCertTypeList");
+	}
+	
+	public void updateCertTypeHidden(CertTypeDTO dto) {
+		mybatis.update("CertType.updateCertTypeHidden", dto);
+	}
 }

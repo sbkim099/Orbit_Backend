@@ -13,6 +13,7 @@ import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
 import com.study.app.domains.annualLeave.AdminLeaveDTO;
 import com.study.app.domains.annualLeave.AnnualLeaveService;
 import com.study.app.domains.certType.CertIssueRequestDTO;
+import com.study.app.domains.certType.CertTypeDTO;
 import com.study.app.domains.certType.CertTypeService;
 import com.study.app.domains.checkoutRequest.CheckoutRequestService;
 import com.study.app.domains.companyInfo.CompanyInfoDAO;
@@ -498,7 +499,13 @@ public class AdminService {
 		certServ.rejectCertRequest(cert_request_seq, reject_reason, loginId);
 	}
 
-
+	public List<CertTypeDTO> getAdminCertTypeList() {
+		return certServ.getAdminCertTypeList();
+	}
+	
+	public void updateCertTypeHidden(CertTypeDTO dto) {
+		certServ.updateCertTypeHidden(dto);
+	}
 
 
 

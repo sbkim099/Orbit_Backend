@@ -50,4 +50,15 @@
 	    where ct.hidden_yn = 'N'
 	    order by ct.cert_type_seq
 	</select>
+	
+	<select id="getAdminCertTypeList" resultType="com.study.app.domains.certType.CertTypeDTO"> 
+		select * from cert_type order by cert_type_seq
+	</select>
+	
+	<update id="updateCertTypeHidden">
+		update cert_type 
+			set hidden_yn = #{hidden_yn},
+				updated_at = sysdate	
+		where cert_type_seq = #{cert_type_seq}
+	</update>
 </mapper>

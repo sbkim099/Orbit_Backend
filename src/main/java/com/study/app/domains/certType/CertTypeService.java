@@ -91,4 +91,12 @@ public class CertTypeService {
 			throw new IllegalStateException("출력 기한이 만료되었거나 출력 가능 횟수를 모두 사용했습니다.");
 		}
 	}
+	
+	public List<CertTypeDTO> getAdminCertTypeList() {
+		return dao.getAdminCertTypeList();
+	}
+	
+	public void updateCertTypeHidden(CertTypeDTO dto) {
+		dao.updateCertTypeHidden(dto);
+	}
 }

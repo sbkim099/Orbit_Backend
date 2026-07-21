@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.study.app.domains.aiChat.AiUnansweredQuestionsDTO;
 import com.study.app.domains.annualLeave.AdminLeaveDTO;
 import com.study.app.domains.certType.CertIssueRequestDTO;
+import com.study.app.domains.certType.CertTypeDTO;
 import com.study.app.domains.companyInfo.CompanyInfoDTO;
 import com.study.app.domains.defaultApprovalLine.DefaultApprovalLineDTO;
 import com.study.app.domains.departments.DepartmentsCountDTO;
@@ -545,8 +546,7 @@ public class AdminController {
 
 	@GetMapping("/hr/getAdminCertRequestList")
 	public ResponseEntity<List<CertIssueRequestDTO>> getAdminCertRequestList() {
-		List<CertIssueRequestDTO> list = adminServ.getAdminCertRequestList();
-		return ResponseEntity.ok(list);
+		return ResponseEntity.ok(adminServ.getAdminCertRequestList());
 	}
 	
 	@PutMapping("/hr/approveCertRequest/{cert_request_seq}")
@@ -560,6 +560,17 @@ public class AdminController {
 	public ResponseEntity<Void> rejectCertRequest(@PathVariable Long cert_request_seq,
 			@RequestBody CertIssueRequestDTO dto, @RequestAttribute String loginId) {
 		adminServ.rejectCertRequest(cert_request_seq, dto.getReject_reason(), loginId);
+		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/hr/getAdminCertTypeList")
+	public ResponseEntity<List<CertTypeDTO>> getAdminCertTypeList() {
+		return ResponseEntity.ok(adminServ.getAdminCertTypeList());
+	}
+	
+	@PutMapping("/hr/updateCertTypeHidden")
+	public ResponseEntity<Void> updateCertTypeHidden(@RequestBody CertTypeDTO dto) {
+		adminServ.updateCertTypeHidden(dto);
 		return ResponseEntity.ok().build();
 	}
 
