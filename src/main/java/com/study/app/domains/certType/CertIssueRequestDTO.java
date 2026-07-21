@@ -1,5 +1,7 @@
 package com.study.app.domains.certType;
 
+import java.time.LocalDateTime;
+
 public class CertIssueRequestDTO {
 	
 	private Long cert_request_seq;
@@ -7,26 +9,34 @@ public class CertIssueRequestDTO {
 	private String users_id;
 	private String request_reason;
 	private String status;
-	private String requested_at;
-	private String hanble_id;
-	private String approved_at;
-	private String rejected_at;
+	private LocalDateTime requested_at;
+	private String handle_id;
+	private LocalDateTime approved_at;
+	private LocalDateTime rejected_at;
 	private String reject_reason;
-	private String canceled_at;
-	private String print_available_at;
-	private String print_expires_at;
+	private LocalDateTime canceled_at;
+	private LocalDateTime print_available_at;
+	private LocalDateTime print_expires_at;
 	private Long applied_print_days;
 	private Long applied_max_print;
 	private Long printed_count;
-	private String created_at;
-	private String updated_at;
+	private LocalDateTime created_at;
+	private LocalDateTime updated_at;
+	
+	private String name;
+	private String dept_name;
+	private String rank_name;
+	private String cert_type_name;
+	private String handler_name;
+	private LocalDateTime processed_at;
 	
 	public CertIssueRequestDTO() {}
 	
 	public CertIssueRequestDTO(Long cert_request_seq, Long cert_type_seq, String users_id, String request_reason,
-			String status, String requested_at, String hanble_id, String approved_at, String rejected_at,
-			String reject_reason, String canceled_at, String print_available_at, String print_expires_at,
-			Long applied_print_days, Long applied_max_print, Long printed_count, String created_at, String updated_at) {
+			String status, LocalDateTime requested_at, String handle_id, LocalDateTime approved_at,
+			LocalDateTime rejected_at, String reject_reason, LocalDateTime canceled_at,
+			LocalDateTime print_available_at, LocalDateTime print_expires_at, Long applied_print_days,
+			Long applied_max_print, Long printed_count, LocalDateTime created_at, LocalDateTime updated_at) {
 		super();
 		this.cert_request_seq = cert_request_seq;
 		this.cert_type_seq = cert_type_seq;
@@ -34,7 +44,7 @@ public class CertIssueRequestDTO {
 		this.request_reason = request_reason;
 		this.status = status;
 		this.requested_at = requested_at;
-		this.hanble_id = hanble_id;
+		this.handle_id = handle_id;
 		this.approved_at = approved_at;
 		this.rejected_at = rejected_at;
 		this.reject_reason = reject_reason;
@@ -78,28 +88,28 @@ public class CertIssueRequestDTO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getRequested_at() {
+	public LocalDateTime getRequested_at() {
 		return requested_at;
 	}
-	public void setRequested_at(String requested_at) {
+	public void setRequested_at(LocalDateTime requested_at) {
 		this.requested_at = requested_at;
 	}
-	public String getHanble_id() {
-		return hanble_id;
+	public String getHandle_id() {
+		return handle_id;
 	}
-	public void setHanble_id(String hanble_id) {
-		this.hanble_id = hanble_id;
+	public void setHandle_id(String handle_id) {
+		this.handle_id = handle_id;
 	}
-	public String getApproved_at() {
+	public LocalDateTime getApproved_at() {
 		return approved_at;
 	}
-	public void setApproved_at(String approved_at) {
+	public void setApproved_at(LocalDateTime approved_at) {
 		this.approved_at = approved_at;
 	}
-	public String getRejected_at() {
+	public LocalDateTime getRejected_at() {
 		return rejected_at;
 	}
-	public void setRejected_at(String rejected_at) {
+	public void setRejected_at(LocalDateTime rejected_at) {
 		this.rejected_at = rejected_at;
 	}
 	public String getReject_reason() {
@@ -108,22 +118,22 @@ public class CertIssueRequestDTO {
 	public void setReject_reason(String reject_reason) {
 		this.reject_reason = reject_reason;
 	}
-	public String getCanceled_at() {
+	public LocalDateTime getCanceled_at() {
 		return canceled_at;
 	}
-	public void setCanceled_at(String canceled_at) {
+	public void setCanceled_at(LocalDateTime canceled_at) {
 		this.canceled_at = canceled_at;
 	}
-	public String getPrint_available_at() {
+	public LocalDateTime getPrint_available_at() {
 		return print_available_at;
 	}
-	public void setPrint_available_at(String print_available_at) {
+	public void setPrint_available_at(LocalDateTime print_available_at) {
 		this.print_available_at = print_available_at;
 	}
-	public String getPrint_expires_at() {
+	public LocalDateTime getPrint_expires_at() {
 		return print_expires_at;
 	}
-	public void setPrint_expires_at(String print_expires_at) {
+	public void setPrint_expires_at(LocalDateTime print_expires_at) {
 		this.print_expires_at = print_expires_at;
 	}
 	public Long getApplied_print_days() {
@@ -144,16 +154,52 @@ public class CertIssueRequestDTO {
 	public void setPrinted_count(Long printed_count) {
 		this.printed_count = printed_count;
 	}
-	public String getCreated_at() {
+	public LocalDateTime getCreated_at() {
 		return created_at;
 	}
-	public void setCreated_at(String created_at) {
+	public void setCreated_at(LocalDateTime created_at) {
 		this.created_at = created_at;
 	}
-	public String getUpdated_at() {
+	public LocalDateTime getUpdated_at() {
 		return updated_at;
 	}
-	public void setUpdated_at(String updated_at) {
+	public void setUpdated_at(LocalDateTime updated_at) {
 		this.updated_at = updated_at;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getDept_name() {
+		return dept_name;
+	}
+	public void setDept_name(String dept_name) {
+		this.dept_name = dept_name;
+	}
+	public String getRank_name() {
+		return rank_name;
+	}
+	public void setRank_name(String rank_name) {
+		this.rank_name = rank_name;
+	}
+	public String getCert_type_name() {
+		return cert_type_name;
+	}
+	public void setCert_type_name(String cert_type_name) {
+		this.cert_type_name = cert_type_name;
+	}
+	public String getHandler_name() {
+		return handler_name;
+	}
+	public void setHandler_name(String handler_name) {
+		this.handler_name = handler_name;
+	}
+	public LocalDateTime getProcessed_at() {
+		return processed_at;
+	}
+	public void setProcessed_at(LocalDateTime processed_at) {
+		this.processed_at = processed_at;
 	}
 }

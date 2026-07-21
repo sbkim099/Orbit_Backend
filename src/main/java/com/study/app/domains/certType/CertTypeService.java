@@ -25,4 +25,8 @@ public class CertTypeService {
 		params.put("loginId", loginId);
 		certReqDao.insertCertRequest(params);
 	}
+	
+	public List<CertIssueRequestDTO> getAdminCertRequestList() {
+		return certReqDao.getAdminCertRequestList();
+	}
 }
