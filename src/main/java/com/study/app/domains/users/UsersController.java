@@ -5,8 +5,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,4 +69,17 @@ public class UsersController {
 		Map<String, String> result = usersServ.updateProfileFile(loginId, file);
 		return ResponseEntity.ok(result);
 	}
+	
+//	@PostMapping("/admin/registerUser")
+//	public ResponseEntity<Void> registerUserByAdmin(
+//	        @RequestBody UsersDTO dto,
+//	        @RequestAttribute String loginId) {
+//
+//	    if (!usersRoleServ.isHrAuthorized(loginId)) {
+//	        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//	    }
+//
+//	    usersServ.registerUserByAdmin(dto);
+//	    return ResponseEntity.ok().build();
+//	}
 }

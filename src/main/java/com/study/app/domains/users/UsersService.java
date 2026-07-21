@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.study.app.commons.EncryptionUtils;
+import com.study.app.domains.annualLeave.AnnualLeaveDAO;
 import com.study.app.domains.file.FileService;
 
 @Service
@@ -16,6 +18,9 @@ public class UsersService {
 	
 	@Autowired
 	private UsersDAO dao;
+	@Autowired
+	private AnnualLeaveDAO alDao;
+	
 	@Autowired
 	private FileService fileServ;
 	
@@ -119,4 +124,15 @@ public class UsersService {
 		}
 		return uploadResult;
 	}
+	
+	//직원관리 - 직원등록용 비번 암호화
+    @Transactional
+    public void registerUserByAdmin(UsersDTO dto) {
+        String originPw = dto.getPw();
+        if (originPw != null && !originPw.isEmpty()) {
+            dto.setPw(EncryptionUtils.getSha512(originPw));
+        }
+        dao.insertUser(dto); //USERS 테이블 등록
+        alDao.insertAnnualLeave(dto.getId()); // 연차 자동 생성
+    }
 }
