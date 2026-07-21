@@ -37,4 +37,7 @@ public class CertIssueRequestDAO {
 		return batis.delete("CertIssueRequest.cancelCertRequest", params);
 	}
 	
+	public int increasePrintedCount(Map<String, Object> params) {
+		return batis.update("CertIssueRequest.increasePrintedCount", params);
+	}
 }

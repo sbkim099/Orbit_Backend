@@ -125,4 +125,16 @@
 		      and users_id = #{loginId}
 		      and status = 'PENDING'
 	</delete>
+	
+	<update id="increasePrintedCount">
+		update cert_issue_request
+			set
+				printed_count = nvl(printed_count, 0) + 1,
+				updated_at = sysdate
+			where cert_request_seq = #{cert_request_seq}
+				and users_id = #{loginId}
+				and status = 'APPROVED'
+				and print_expires_at >= sysdate
+				and nvl(printed_count, 0) <![CDATA[ < ]]> nvl(applied_max_print, 0)
+	</update>
 </mapper>

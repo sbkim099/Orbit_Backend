@@ -78,4 +78,17 @@ public class CertTypeService {
 			throw new IllegalStateException("취소할 수 없는 신청이거나 이미 처리된 신청입니다.");
 		}
 	}
+	
+	@Transactional
+	public void increasePrintedCount(Long cert_request_seq, String loginId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("cert_request_seq", cert_request_seq);
+		params.put("loginId", loginId);
+		
+		int result = certReqDao.increasePrintedCount(params);
+		
+		if(result == 0) {
+			throw new IllegalStateException("출력 기한이 만료되었거나 출력 가능 횟수를 모두 사용했습니다.");
+		}
+	}
 }
