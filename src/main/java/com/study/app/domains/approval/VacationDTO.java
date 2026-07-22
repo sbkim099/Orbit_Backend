@@ -11,15 +11,18 @@ public class VacationDTO extends DraftDocumentsDTO {
 	private Double days;
 	private String reason;
 	private Double remaining_days;
+	private String cancel_yn;
 	
 	private List<ApprovalLinesDTO> approvers;
     private List<ApprovalCcDTO> referrers;
     private List<VacationAttachmentsDTO> attachments;
+    
+    private String target_title;
 	
 	public VacationDTO() {}
 	public VacationDTO(Long vac_seq, Long doc_seq, String vac_type, String start_date, String end_date, Double days,
-			String reason, Double remaining_days, List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers,
-			List<VacationAttachmentsDTO> attachments) {
+			String reason, Double remaining_days, String cancel_yn, List<ApprovalLinesDTO> approvers, List<ApprovalCcDTO> referrers,
+			List<VacationAttachmentsDTO> attachments, String target_title) {
 		super();
 		this.vac_seq = vac_seq;
 		this.doc_seq = doc_seq;
@@ -29,9 +32,11 @@ public class VacationDTO extends DraftDocumentsDTO {
 		this.days = days;
 		this.reason = reason;
 		this.remaining_days = remaining_days;
+		this.cancel_yn = cancel_yn;
 		this.approvers = approvers;
 		this.referrers = referrers;
 		this.attachments = attachments;
+		this.target_title = target_title;
 	}
 	public Long getVac_seq() {
 		return vac_seq;
@@ -81,6 +86,12 @@ public class VacationDTO extends DraftDocumentsDTO {
 	public void setRemaining_days(Double remaining_days) {
 		this.remaining_days = remaining_days;
 	}
+	public String getCancel_yn() {
+		return cancel_yn;
+	}
+	public void setCancel_yn(String cancel_yn) {
+		this.cancel_yn = cancel_yn;
+	}
 	public List<ApprovalLinesDTO> getApprovers() {
 		return approvers;
 	}
@@ -98,5 +109,11 @@ public class VacationDTO extends DraftDocumentsDTO {
 	}
 	public void setAttachments(List<VacationAttachmentsDTO> attachments) {
 		this.attachments = attachments;
+	}
+	public String getTarget_title() {
+		return target_title;
+	}
+	public void setTarget_title(String target_title) {
+		this.target_title = target_title;
 	}
 }

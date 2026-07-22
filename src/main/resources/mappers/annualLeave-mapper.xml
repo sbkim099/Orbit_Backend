@@ -21,7 +21,8 @@
 	</select>
 
 	<update id="updateAnnualLeaveUsedDays">
-		update annual_leave set used_days = #{used_days}, remaining_days = #{remaining_days} where users_id = #{users_id}
+		update annual_leave set used_days = #{used_days}, remaining_days = #{remaining_days} 
+		where users_id = #{users_id} and year = to_number(to_char(sysdate, 'YYYY'))
 	</update>
 	
 	<select id="findAnnualLeaveTargetUsers" resultType="com.study.app.domains.annualLeave.AnnualLeaveUpdateDTO">

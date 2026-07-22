@@ -12,7 +12,19 @@ public class CertTypeDAO {
 	@Autowired
 	private SqlSessionTemplate mybatis;
 	
-	public List<CertTypeDTO> getCertType() {
-		return mybatis.selectList("CertType.getCertType");
+	public List<CertTypeDTO> getCertType(String loginId) {
+		return mybatis.selectList("CertType.getCertType", loginId);
+	}
+	
+	public List<CertTypeDTO> getAdminCertTypeList() {
+		return mybatis.selectList("CertType.getAdminCertTypeList");
+	}
+	
+	public void updateCertTypeHidden(CertTypeDTO dto) {
+		mybatis.update("CertType.updateCertTypeHidden", dto);
+	}
+	
+	public void updateCertType(CertTypeDTO dto) {
+		mybatis.update("CertType.updateCertType", dto);
 	}
 }
