@@ -7,7 +7,11 @@
 	</select>
 	
 	<select id="isExistEmail" resultType="int">
-		select count(*) from signup where email = #{email} and status in ('PENDING','APPROVED')
+		select count(*) from (
+			select email from signup where email = #{email} and status in ('PENDING','APPROVED')
+			union
+	        select email from users where email = #{email}
+        )
 	</select>
 
 	<insert id="signupRequest">
