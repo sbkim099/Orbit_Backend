@@ -19,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/users")
 public class UsersController {
 	
-	private static final Logger log = LoggerFactory.getLogger(UsersController.class);
-	
 	@Autowired
 	private UsersService usersServ;
 	

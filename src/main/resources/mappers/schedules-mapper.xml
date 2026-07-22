@@ -65,6 +65,7 @@
 	    FROM vacation v
 	    JOIN draft_documents d ON v.doc_seq = d.doc_seq
 	    WHERE d.status = 'APPROVED'
+	    AND v.cancel_yn = 'N'
 	    AND d.users_id = #{users_id}
 	</select>
 	

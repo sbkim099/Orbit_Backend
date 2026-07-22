@@ -44,6 +44,7 @@ import com.study.app.domains.supplies.SupplyRequestDTO;
 import com.study.app.domains.supplies.SupplyService;
 import com.study.app.domains.users.UsersDAO;
 import com.study.app.domains.users.UsersDTO;
+import com.study.app.domains.users.UsersRoleService;
 import com.study.app.domains.users.UsersService;
 
 @Service
@@ -766,4 +767,15 @@ public class AdminService {
 
 
 
+    @Autowired
+    private UsersRoleService usersRoleServ;
+	
+	public boolean isHrAuthorized(String loginId) {   // ← 이 메서드가 있어야 함
+        return usersRoleServ.isHrAuthorized(loginId);
+    }
+	
+	//직원 관리 - 직원 등록  
+	public void registerUserByAdmin(UsersDTO dto, MultipartFile profile) {
+        usersServ.registerUserByAdmin(dto,profile); 
+	}
 }

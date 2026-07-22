@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -827,4 +828,17 @@ public class AdminController {
 
 
 
+	@PostMapping("/hr/registerUser")
+    public ResponseEntity<Void> registerUserByAdmin(
+            @RequestPart("input") UsersDTO dto,
+            @RequestPart(value = "file", required = false) MultipartFile profile,
+            @RequestAttribute String loginId) {
+
+        if (!adminServ.isHrAuthorized(loginId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        adminServ.registerUserByAdmin(dto,profile);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -47,6 +47,7 @@
 		    JOIN DRAFT_DOCUMENTS dd ON v.DOC_SEQ = dd.DOC_SEQ
 		    WHERE dd.USERS_ID = #{loginId}
 		    AND dd.STATUS = 'APPROVED'
+		    AND NVL(v.CANCEL_YN, 'N') = 'N'
 		    AND TO_CHAR(v.START_DATE, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
 		) AS vac_cnt
 	FROM ATTENDANCE
@@ -73,6 +74,7 @@
 	            JOIN DRAFT_DOCUMENTS dd ON v.DOC_SEQ = dd.DOC_SEQ
 	            WHERE dd.USERS_ID = #{loginId}
 	              AND dd.STATUS = 'APPROVED'
+	              AND NVL(v.CANCEL_YN, 'N') = 'N'
 	              AND v.START_DATE >= TRUNC(SYSDATE, 'IW')
 	              AND v.START_DATE < TRUNC(SYSDATE, 'IW') + 7
 	        ) AS "vac_cnt"
