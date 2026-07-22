@@ -173,6 +173,7 @@ public class UsersService {
         }
         
         dao.insertUserByAdmin(dto); //USERS 테이블 등록
+        dao.insertSignupByAdmin(dto); // SIGNUP 테이블 등록
         alDao.insertAnnualLeave(dto.getId()); // 연차 자동 생성
     }
 }
