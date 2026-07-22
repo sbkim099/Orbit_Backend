@@ -192,6 +192,7 @@
 	        u.address1,
 	        u.address2,
 	        u.hire_date,
+	        u.ssn_masked,
 	        d.dept_seq,
 	        d.dept_name,
 	        r.rank_seq,
@@ -206,9 +207,18 @@
 	    WHERE u.id = #{loginId}
 	</select>
 	<update id="updateMyPageInfo">
-		update users set 
-			phone=#{phone}, email=#{email}, zonecode=#{zonecode}, address1=#{address1}, address2=#{address2} 
-		where id = #{id}
+		update users
+	    <set>
+	        phone = #{phone},
+	        email = #{email},
+	        zonecode = #{zonecode},
+	        address1 = #{address1},
+	        address2 = #{address2}
+	        <if test="ssn_enc != null">, ssn_enc = #{ssn_enc}</if>
+	        <if test="ssn_hash != null">, ssn_hash = #{ssn_hash}</if>
+	        <if test="ssn_masked != null">, ssn_masked = #{ssn_masked}</if>
+	    </set>
+	    where id = #{id}
 	</update>
 	
 	<!-- 도장 등록 -->
