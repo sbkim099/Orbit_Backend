@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserSettings">
+	 <!--개인화 설정 - 빠른실행 순서 조회-->
+	<select id="selectQuickActionOrder" resultType="String">
+	    SELECT quick_action_order
+	    FROM user_settings
+	    WHERE users_seq = (SELECT users_seq FROM users WHERE id = #{loginId})
+	</select>
+	
+	<insert id="insertQuickActionOrder" >
+	    INSERT INTO user_settings (users_seq, quick_action_order)
+	    VALUES ((SELECT users_seq FROM users WHERE id = #{loginId}), #{quickActionOrder})
+	</insert>
+	
+	<update id="updateQuickActionOrder">
+	    UPDATE user_settings
+	    SET quick_action_order = #{quickActionOrder}
+	    WHERE users_seq = (SELECT users_seq FROM users WHERE id = #{loginId})
+	</update>
+</mapper>
