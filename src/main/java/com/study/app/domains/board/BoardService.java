@@ -25,18 +25,9 @@ public class BoardService {
     private UsersService usersService;
     @Autowired
     private UsersRoleService usersRoleServ;
-
-    public void checkNoticePermission(String loginId, String category) throws AccessDeniedException {
-    	 if (!"자유".equals(category)) {
-    	        if (!usersRoleServ.isHrAuthorized(loginId)) {
-    	            throw new AccessDeniedException("공지성 게시글 작성 권한이 없습니다.");
-    	        }
-    	 }
-    }
     
 	@Transactional //여러 DB 작업을 하나로 묶어주는 어노테이션
 	public void writePost(BoardPostsDTO post, List<MultipartFile> files) throws Exception {
-		checkNoticePermission(post.getUsers_id(), post.getCategory());
 	    // 게시글 저장
 	    boardDAO.insertPost(post);
 
@@ -131,7 +122,6 @@ public class BoardService {
     public void updatePost(BoardPostsDTO post, List<MultipartFile> newFiles, 
     		List<Long> deletedFileSeqs, List<String> deletedImageUrls) throws Exception {
         
-    	checkNoticePermission(post.getUsers_id(), post.getCategory());
         // 1. 게시글 수정
         boardDAO.updatePost(post);
         
