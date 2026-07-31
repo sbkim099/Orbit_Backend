@@ -26,6 +26,8 @@ public class UsersDTO {
 	private String update_at;
 	private String sysname;
 	private String is_hr_manager;
+	private String leave_date;
+	private String status_date;
 	
 	private String dept_name;
     private String rank_name;
@@ -48,7 +50,7 @@ public class UsersDTO {
 	public UsersDTO(String id, String pw, Long users_seq, String name, String phone, String email, String oriname,
 			String ssn, String ssn_hash, String ssn_enc, String ssn_masked, String zonecode, String address1,
 			String address2, String role, String status, String hire_date, String resign_date, Long dept_seq,
-			Long rank_seq, String created_at, String update_at, String sysname, String is_hr_manager, String dept_name,
+			Long rank_seq, String created_at, String update_at, String sysname, String is_hr_manager, String leave_date, String dept_name,
 			String rank_name, Long rank_order, String auth_group, Long parent_dept_seq, String stamp_sysname,
 			String stamp_oriname, Long stamp_seq, Double remaining_days, String user_auth_group, String profile_url) {
 		super();
@@ -76,6 +78,7 @@ public class UsersDTO {
 		this.update_at = update_at;
 		this.sysname = sysname;
 		this.is_hr_manager = is_hr_manager;
+		this.leave_date = leave_date;
 		this.dept_name = dept_name;
 		this.rank_name = rank_name;
 		this.rank_order = rank_order;
@@ -367,6 +370,18 @@ public class UsersDTO {
 
 	public void setProfile_url(String profile_url) {
 		this.profile_url = profile_url;
+	}
+	public String getLeave_date() {
+		return leave_date;
+	}
+	public void setLeave_date(String leave_date) {
+		this.leave_date = leave_date;
+	}
+	public String getStatus_date() {
+		return status_date;
+	}
+	public void setStatus_date(String status_date) {
+		this.status_date = status_date;
 	}
 
 }
